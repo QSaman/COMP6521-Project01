@@ -15,5 +15,9 @@ public class MP1 {
 		List<Student> list = br.nextBlock();
 		for (Student s : list)
 			System.out.println(s);
+		// TEST
+		if (list.get(0).equals(list.get(1))) {
+			System.out.println(".equals works properly!");
+		}
 	}
 }
