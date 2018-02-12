@@ -1,5 +1,6 @@
 package com.mp1;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -16,69 +17,28 @@ public class Student {
 	public static final int sin_number_len = 9;
 	public static final int address_len = 57;
 
-	private byte[] studentID = new byte[8];
+	private int studentId;
 	private byte[] firstName = new byte[10];
 	private byte[] lastName = new byte[10];
-	private byte[] department = new byte[3];
-	private byte[] program = new byte[3];
-	private byte[] sinNumber = new byte[9];
+	private short department;
+	private short program;
+	private int sinNumber;
 	private byte[] address = new byte[57];
 
 	public Student() {
 	}
-
-	public Student(byte[] fields) {
-		setFields(fields);
+	
+	public void parseLine(String line)
+	{
+		studentId = Integer.parseInt(line.substring(0, 8));
+		firstName = line.substring(8, 18).getBytes(StandardCharsets.US_ASCII);
+		lastName = line.substring(18, 28).getBytes(StandardCharsets.US_ASCII);
+		department = Short.parseShort(line.substring(28, 31));
+		program = Short.parseShort(line.substring(31, 34));
+		sinNumber = Integer.parseInt(line.substring(34, 43));
+		address = line.substring(43, 100).getBytes(StandardCharsets.US_ASCII);
 	}
 
-	public Student(byte[] studentID, byte[] firstName, byte[] lastName, byte[] department, byte[] program,
-			byte[] sinNumber, byte[] address) {
-		this.studentID = studentID;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.department = department;
-		this.program = program;
-		this.sinNumber = sinNumber;
-		this.address = address;
-	}
-
-	public byte[] getFields() {
-		byte[] fields = new byte[100];
-		int i = 0;
-		for (byte b : studentID)
-			fields[i++] = b;
-		for (byte b : firstName)
-			fields[i++] = b;
-		for (byte b : lastName)
-			fields[i++] = b;
-		for (byte b : department)
-			fields[i++] = b;
-		for (byte b : program)
-			fields[i++] = b;
-		for (byte b : sinNumber)
-			fields[i++] = b;
-		for (byte b : address)
-			fields[i++] = b;
-		return fields;
-	}
-
-	public void setFields(byte[] fields) {
-		studentID = Arrays.copyOfRange(fields, 0, 8);
-		firstName = Arrays.copyOfRange(fields, 8, 18);
-		lastName = Arrays.copyOfRange(fields, 18, 28);
-		department = Arrays.copyOfRange(fields, 28, 31);
-		program = Arrays.copyOfRange(fields, 31, 34);
-		sinNumber = Arrays.copyOfRange(fields, 34, 43);
-		address = Arrays.copyOfRange(fields, 43, 100);
-	}
-
-	public byte[] getStudentID() {
-		return studentID;
-	}
-
-	public void setStudentID(byte[] studentID) {
-		this.studentID = studentID;
-	}
 
 	public byte[] getFirstName() {
 		return firstName;
@@ -96,49 +56,104 @@ public class Student {
 		this.lastName = lastName;
 	}
 
-	public byte[] getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(byte[] department) {
-		this.department = department;
-	}
-
-	public byte[] getProgram() {
-		return program;
-	}
-
-	public void setProgram(byte[] program) {
-		this.program = program;
-	}
-
-	public byte[] getSinNumber() {
-		return sinNumber;
-	}
-
-	public void setSinNumber(byte[] sinNumber) {
-		this.sinNumber = sinNumber;
-	}
-
 	public byte[] getAddress() {
 		return address;
 	}
 
 	public void setAddress(byte[] address) {
 		this.address = address;
+	}		
+
+	/**
+	 * @return the studentId
+	 */
+	public int getStudentId() {
+		return studentId;
+	}
+
+	/**
+	 * @param studentId the studentId to set
+	 */
+	public void setStudentId(int studentId) {
+		this.studentId = studentId;
+	}
+
+	/**
+	 * @return the department
+	 */
+	public short getDepartment() {
+		return department;
+	}
+
+	/**
+	 * @param department the department to set
+	 */
+	public void setDepartment(short department) {
+		this.department = department;
+	}
+
+	/**
+	 * @return the program
+	 */
+	public short getProgram() {
+		return program;
+	}
+
+	/**
+	 * @param program the program to set
+	 */
+	public void setProgram(short program) {
+		this.program = program;
+	}
+
+	/**
+	 * @return the sinNumber
+	 */
+	public int getSinNumber() {
+		return sinNumber;
+	}
+
+	/**
+	 * @param sinNumber the sinNumber to set
+	 */
+	public void setSinNumber(int sinNumber) {
+		this.sinNumber = sinNumber;
 	}
 
 	@Override
 	public String toString() {
-		String[] fields = new String[] { new String(studentID), new String(firstName), new String(lastName),
-				new String(department), new String(program), new String(sinNumber), new String(address) };
+		String[] fields = new String[] { Integer.toString(studentId), new String(firstName), new String(lastName),
+				Short.toString(department), Short.toString(program), Integer.toString(sinNumber), new String(address) };
 		return "Student ID: " + fields[0] + "\r\nFirst Name: " + fields[1] + "\r\nLast Name: " + fields[2]
 				+ "\r\nDepartment: " + fields[3] + "\r\nProgram: " + fields[4] + "\r\nSIN Number: " + fields[5]
 				+ "\r\nAddress: " + fields[6];
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
-	public boolean equals(Object other) {
-		return Arrays.equals(getFields(), ((Student) other).getFields());
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + studentId;
+		return result;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Student))
+			return false;
+		Student other = (Student) obj;
+		if (studentId != other.studentId)
+			return false;
+		return true;
+	}	
 }

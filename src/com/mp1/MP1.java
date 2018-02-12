@@ -10,7 +10,7 @@ public class MP1 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		BlockReader br = new BlockReader();
+		BlockReader br = new BlockReader();		
 		br.open("input.txt");
 		List<Student> list = br.nextBlock();
 		for (Student s : list)

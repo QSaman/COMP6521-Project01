@@ -43,7 +43,8 @@ public class BlockReader {
 		int tuples = 0;
 		while (tuples < 40 && (line = br.readLine()) != null) {
 			++tuples;
-			Student student = new Student(line.getBytes(StandardCharsets.US_ASCII));
+			Student student = new Student();
+			student.parseLine(line);
 			ret.add(student);
 		}
 		return ret;
