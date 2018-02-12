@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.SizeLimitExceededException;
+
 /**
  * 
  */
@@ -37,15 +39,20 @@ public class BlockReader {
 		br.close();
 	}
 
-	List<Student> nextBlock() throws IOException {
-		ArrayList<Student> ret = new ArrayList<>();
+	MemoryBuffer nextBlock() throws IOException {
+		MemoryBuffer ret = new MemoryBuffer();
 		String line;
 		int tuples = 0;
 		while (tuples < 40 && (line = br.readLine()) != null) {
 			++tuples;
 			Student student = new Student();
 			student.parseLine(line);
-			ret.add(student);
+			try {
+				ret.add(student);
+			} catch (SizeLimitExceededException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return ret;
 	}

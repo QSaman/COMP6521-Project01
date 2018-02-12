@@ -9,6 +9,7 @@ import java.util.Arrays;
  */
 public class Student {
 
+	//TODO If we don't use the following static variables, remove them for saving more memory
 	public static final int student_id_len = 8;
 	public static final int first_name_len = 10;
 	public static final int last_name_len = 10;

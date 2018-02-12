@@ -12,11 +12,10 @@ public class MP1 {
 	public static void main(String[] args) throws IOException {
 		BlockReader br = new BlockReader();		
 		br.open("input.txt");
-		List<Student> list = br.nextBlock();
-		for (Student s : list)
-			System.out.println(s);
+		MemoryBuffer buffer = br.nextBlock();
+		System.out.println(buffer);
 		// TEST
-		if (list.get(0).equals(list.get(1))) {
+		if (buffer.get(0).equals(buffer.get(1))) {
 			System.out.println(".equals works properly!");
 		}
 	}
