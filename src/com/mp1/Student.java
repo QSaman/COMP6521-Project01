@@ -42,6 +42,26 @@ public class Student {
 		this.address = address;
 	}
 
+	public byte[] getFields() {
+		byte[] fields = new byte[100];
+		int i = 0;
+		for (byte b : studentID)
+			fields[i++] = b;
+		for (byte b : firstName)
+			fields[i++] = b;
+		for (byte b : lastName)
+			fields[i++] = b;
+		for (byte b : department)
+			fields[i++] = b;
+		for (byte b : program)
+			fields[i++] = b;
+		for (byte b : sinNumber)
+			fields[i++] = b;
+		for (byte b : address)
+			fields[i++] = b;
+		return fields;
+	}
+
 	public void setFields(byte[] fields) {
 		studentID = Arrays.copyOfRange(fields, 0, 8);
 		firstName = Arrays.copyOfRange(fields, 8, 18);
@@ -115,5 +135,10 @@ public class Student {
 		return "Student ID: " + fields[0] + "\r\nFirst Name: " + fields[1] + "\r\nLast Name: " + fields[2]
 				+ "\r\nDepartment: " + fields[3] + "\r\nProgram: " + fields[4] + "\r\nSIN Number: " + fields[5]
 				+ "\r\nAddress: " + fields[6];
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		return Arrays.equals(getFields(), ((Student) other).getFields());
 	}
 }
