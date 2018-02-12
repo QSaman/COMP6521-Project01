@@ -30,12 +30,19 @@ public class BlockReader {
 		br = new BufferedReader(new FileReader(file_name));
 	}
 	
+	public void close() throws IOException
+	{
+		br.close();
+	}
+	
 	List<Schema> nextBlock() throws IOException
 	{
 		ArrayList<Schema> ret = new ArrayList<>();
 		String line;
-		while ((line = br.readLine()) != null)
+		int tuples = 0;
+		while (tuples < 40 && (line = br.readLine()) != null)
 		{
+			++tuples;
 			int i = 0;
 			Schema schema = new Schema();
 						
@@ -51,7 +58,7 @@ public class BlockReader {
 			i += Schema.program_len;
 			schema.sin_number = Integer.parseInt(line.substring(i,  i + Schema.sin_number_len));
 			i += Schema.sin_number_len;
-			schema.address = line.substring(i, Schema.address_len).trim();
+			schema.address = line.substring(i, i + Schema.address_len).trim();
 			i += Schema.address_len;
 			
 			ret.add(schema);
@@ -61,10 +68,14 @@ public class BlockReader {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	public static void main(String[] args) throws IOException {
+		BlockReader br = new BlockReader();
+		br.open("input.txt");
+		List<Schema> list = br.nextBlock();
+		for (Schema s : list)
+			System.out.println(s);
 	}
 
 }

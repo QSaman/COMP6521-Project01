@@ -30,5 +30,16 @@ public class Schema {
 	public Schema() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("studen id: ").append(student_id).append(", first name: ").append(first_name);
+		sb.append(", last name: ").append(last_name).append(", department: ").append(department);
+		sb.append(", program: ").append(program).append(", sin number: ").append(sin_number);
+		sb.append(", address: ").append(address);
+		return sb.toString();
+	}
 
 }
