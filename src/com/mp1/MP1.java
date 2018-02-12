@@ -3,6 +3,8 @@ package com.mp1;
 import java.io.IOException;
 import java.util.List;
 
+import com.mp1.disk.BlockReader;
+
 public class MP1 {
 
 	/**

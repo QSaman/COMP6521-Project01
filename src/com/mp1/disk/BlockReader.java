@@ -1,4 +1,4 @@
-package com.mp1;
+package com.mp1.disk;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.SizeLimitExceededException;
+
+import com.mp1.MemoryBuffer;
+import com.mp1.Student;
 
 /**
  * 
@@ -39,7 +42,7 @@ public class BlockReader {
 		br.close();
 	}
 
-	MemoryBuffer nextBlock() throws IOException {
+	public MemoryBuffer nextBlock() throws IOException {
 		MemoryBuffer ret = new MemoryBuffer();
 		String line;
 		int tuples = 0;
