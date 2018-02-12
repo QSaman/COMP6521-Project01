@@ -42,8 +42,7 @@ public class BlockReader {
 		br.close();
 	}
 
-	public MemoryBuffer nextBlock() throws IOException {
-		MemoryBuffer ret = new MemoryBuffer();
+	public void nextBlock(MemoryBuffer buffer) throws IOException {
 		String line;
 		int tuples = 0;
 		while (tuples < 40 && (line = br.readLine()) != null) {
@@ -51,12 +50,11 @@ public class BlockReader {
 			Student student = new Student();
 			student.parseLine(line);
 			try {
-				ret.add(student);
+				buffer.add(student);
 			} catch (SizeLimitExceededException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return ret;
 	}
 }

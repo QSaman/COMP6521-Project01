@@ -14,12 +14,14 @@ import javax.naming.SizeLimitExceededException;
 public class MemoryBuffer {
 	
 	private ArrayList<Student> students;
+	private boolean done;
 
 	/**
 	 * 
 	 */
 	public MemoryBuffer() {
 		students = new ArrayList<>();
+		clear();
 	}
 	
 	public void add(Student student) throws SizeLimitExceededException
@@ -28,6 +30,17 @@ public class MemoryBuffer {
 			students.add(student);
 		else
 			throw new SizeLimitExceededException("Memory buffer cannot have more than 40 tuples");
+	}
+	
+	public boolean isFull()
+	{
+		return students.size() == 40;
+	}
+	
+	public void clear()
+	{
+		students.clear();
+		done = false;
 	}
 	
 	public Student get(int i)
@@ -43,5 +56,21 @@ public class MemoryBuffer {
 			ret += s + "\n";
 		return ret;
 	}
+
+	/**
+	 * @return the done
+	 */
+	public boolean isDone() {
+		return done;
+	}
+
+	/**
+	 * @param done the done to set
+	 */
+	public void setDone(boolean done) {
+		this.done = done;
+	}
+	
+	
 
 }
