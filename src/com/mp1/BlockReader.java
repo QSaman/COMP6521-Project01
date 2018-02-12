@@ -1,3 +1,5 @@
+package com.mp1;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -13,6 +15,7 @@ import java.util.List;
  * @author saman
  *
  */
+
 public class BlockReader {
 	private BufferedReader br;
 
