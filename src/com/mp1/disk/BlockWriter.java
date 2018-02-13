@@ -26,7 +26,12 @@ public class BlockWriter {
 	
 	public void open(String file_name) throws FileNotFoundException
 	{
-		fos = new FileOutputStream(new File(file_name));
+		open(file_name, false);
+	}
+	
+	public void open(String file_name, boolean append) throws FileNotFoundException
+	{
+		fos = new FileOutputStream(new File(file_name), append);
 	}
 	
 	public void close() throws IOException

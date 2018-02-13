@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.mp1.disk.BlockReader;
+import com.mp1.disk.BlockWriter;
 
 /**
  * @author saman
@@ -39,7 +40,7 @@ public class Tpmms {
 		boolean two_phase = true;
 		while (true)
 		{
-			if (Runtime.getRuntime().freeMemory() <= 400)
+			if (Runtime.getRuntime().freeMemory() <= 4096)
 			{
 				two_phase = false;
 				break;
@@ -59,17 +60,39 @@ public class Tpmms {
 		return buffers.size() != 1;
 	}
 	
+	public void save()
+	{
+		int i = 1;
+		for (MemoryBuffer buffer : buffers)
+			if (!buffer.isDone())
+			{
+				BlockWriter bw = new BlockWriter();
+				try {
+					bw.open(String.format("sublist%04d.out", i++), true);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+	}
+	
+	public void merge()
+	{
+		
+	}
+	
 	public void findDuplicates() throws IOException
 	{
 		if (phase1())
 		{
-			if (mergeRequired())
-			{
-				//TODO We can find duplicates in exactly 2 phases
+			if (mergeRequired())	//We can find duplicates in exactly 2 phases
+			{				
+				save();
+				merge();
 			}
-			else
+			else	//We can find duplicates only in 1 phase
 			{
-				//TODO We can find duplicates only in 1 phase
+				merge();
 			}
 		}
 		else
