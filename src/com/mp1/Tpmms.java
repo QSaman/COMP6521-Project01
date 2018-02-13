@@ -69,7 +69,9 @@ public class Tpmms {
 				BlockWriter bw = new BlockWriter();
 				try {
 					bw.open(String.format("sublist%04d.out", i++), true);
-				} catch (FileNotFoundException e) {
+					bw.write(buffer);
+					bw.close();
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
