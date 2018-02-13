@@ -17,6 +17,7 @@ public class MP1 {
 		br.open("input.txt");
 		MemoryBuffer buffer = new MemoryBuffer();
 		br.nextBlock(buffer);
+		buffer.sort();
 		System.out.println(buffer);
 		// TEST
 		if (buffer.get(0).equals(buffer.get(1))) {
