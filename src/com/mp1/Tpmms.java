@@ -29,6 +29,11 @@ public class Tpmms {
 		inputReader.open(input_file_name);
 	}
 	
+	/**
+	 * 
+	 * @return true, if we can sort the relation in two phases; otherwise return false
+	 * @throws IOException
+	 */
 	public boolean phase1() throws IOException
 	{
 		boolean two_phase = true;
