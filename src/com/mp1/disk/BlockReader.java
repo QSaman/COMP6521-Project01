@@ -39,7 +39,8 @@ public class BlockReader {
 	}
 
 	public void close() throws IOException {
-		br.close();
+		if (br != null)
+			br.close();
 	}
 
 	public void nextBlock(MemoryBuffer buffer) throws IOException {

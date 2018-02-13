@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.mp1.disk.BlockReader;
+import com.mp1.disk.BlockWriter;
 
 public class MP1 {
 
@@ -19,7 +20,12 @@ public class MP1 {
 		System.out.println(buffer);
 		// TEST
 		if (buffer.get(0).equals(buffer.get(1))) {
-			System.out.println(".equals works properly!");
+			System.out.println(".equals works properly!");			
 		}
+		BlockWriter bw = new BlockWriter();
+		bw.open("output.txt");
+		bw.write(buffer);
+		bw.close();
+		br.close();
 	}
 }

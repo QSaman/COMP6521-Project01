@@ -1,7 +1,6 @@
 package com.mp1;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * @author mirmohammad
@@ -38,6 +37,24 @@ public class Student {
 		program = Short.parseShort(line.substring(31, 34));
 		sinNumber = Integer.parseInt(line.substring(34, 43));
 		address = line.substring(43, 100).getBytes(StandardCharsets.US_ASCII);
+	}
+	
+	public byte[] getBytes()
+	{
+		byte[] ret = new byte[100];
+		
+		System.arraycopy(String.format("%08d", studentId).getBytes(StandardCharsets.US_ASCII), 
+				0, ret, 0, 8);
+		System.arraycopy(firstName, 0, ret, 8, 10);
+		System.arraycopy(lastName, 0, ret, 18, 10);
+		System.arraycopy(String.format("%03d", department).getBytes(StandardCharsets.US_ASCII), 
+				0, ret, 28, 3);
+		System.arraycopy(String.format("%03d", program).getBytes(StandardCharsets.US_ASCII), 
+				0, ret, 31, 3);
+		System.arraycopy(String.format("%09d", sinNumber).getBytes(StandardCharsets.US_ASCII), 
+				0, ret, 34, 9);
+		System.arraycopy(address, 0, ret, 43, 57);
+		return ret;
 	}
 
 

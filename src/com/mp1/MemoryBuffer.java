@@ -37,6 +37,11 @@ public class MemoryBuffer {
 		return students.size() == 40;
 	}
 	
+	public int size()
+	{
+		return students.size();
+	}
+	
 	public void clear()
 	{
 		students.clear();
@@ -69,8 +74,5 @@ public class MemoryBuffer {
 	 */
 	public void setDone(boolean done) {
 		this.done = done;
-	}
-	
-	
-
+	}		
 }
