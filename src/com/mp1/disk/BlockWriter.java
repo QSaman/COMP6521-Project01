@@ -3,11 +3,14 @@
  */
 package com.mp1.disk;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
+import com.mp1.Buffer;
 import com.mp1.MemoryBuffer;
 
 /**
@@ -16,12 +19,17 @@ import com.mp1.MemoryBuffer;
  */
 public class BlockWriter {
 	FileOutputStream fos;
+	BufferedWriter bw;
 
 	/**
 	 * 
 	 */
 	public BlockWriter() {
 		fos = null;
+	}
+	
+	public void openOutputFile(String file_name) throws IOException {
+		bw = new BufferedWriter(new FileWriter(file_name));
 	}
 	
 	public void open(String file_name) throws FileNotFoundException
@@ -52,5 +60,7 @@ public class BlockWriter {
 			fos.write(buffer.get(i).getBytes());			
 		}
 	}
-
+	public void writeOutputBuffer(Buffer buffer) throws IOException {
+		bw.write(buffer.toString());
+	}
 }

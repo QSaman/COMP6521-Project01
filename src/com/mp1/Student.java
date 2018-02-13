@@ -178,5 +178,9 @@ public class Student implements Comparable<Student> {
 	@Override
 	public int compareTo(Student o) {
 		return studentId - o.getStudentId();
-	}	
+	}
+	
+	public boolean isLessThan(Student o) {
+		return studentId - o.getStudentId() < 0 ? true : false;
+	}
 }

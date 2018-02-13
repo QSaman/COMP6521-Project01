@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import javax.naming.SizeLimitExceededException;
 
+import com.mp1.Buffer;
 import com.mp1.MemoryBuffer;
 import com.mp1.Student;
 
@@ -54,6 +55,15 @@ public class BlockReader {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public void nextInputBuffer(Buffer inputBuffer) throws IOException {
+		String line;
+		for(int i = 0; i < inputBuffer.size && (line = br.readLine()) != null; i++) {
+			Student student = new Student();
+			student.parseLine(line);
+			inputBuffer.add(student);
 		}
 	}
 }
