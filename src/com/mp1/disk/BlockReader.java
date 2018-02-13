@@ -11,20 +11,12 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
- *
- */
-
-/**
  * @author saman
  */
-
 public class BlockReader {
 
     private BufferedReader br;
 
-    /**
-     * @throws FileNotFoundException
-     */
     public BlockReader() {
         br = null;
     }

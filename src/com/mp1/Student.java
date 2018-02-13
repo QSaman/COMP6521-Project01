@@ -18,6 +18,10 @@ public class Student implements Comparable<Student> {
     public Student() {
     }
 
+    public Student(String entry) {
+        parseLine(entry);
+    }
+
     public void parseLine(String line) {
         studentId = Integer.parseInt(line.substring(0, 8));
         firstName = line.substring(8, 18).getBytes(StandardCharsets.US_ASCII);
