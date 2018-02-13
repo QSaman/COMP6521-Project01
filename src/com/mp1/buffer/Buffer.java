@@ -1,4 +1,6 @@
-package com.mp1;
+package com.mp1.buffer;
+
+import com.mp1.schema.Student;
 
 public class Buffer {
 

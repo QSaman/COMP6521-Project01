@@ -1,4 +1,4 @@
-package com.mp1;
+package com.mp1.schema;
 
 import java.nio.charset.StandardCharsets;
 

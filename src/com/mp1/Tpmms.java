@@ -1,9 +1,11 @@
 package com.mp1;
 
+import com.mp1.buffer.InputBuffer;
+import com.mp1.buffer.MemoryBuffer;
+import com.mp1.buffer.OutputBuffer;
 import com.mp1.disk.BlockReader;
 import com.mp1.disk.BlockWriter;
-import com.mp1.disk.BufferReader;
-import com.mp1.disk.BufferWriter;
+import com.mp1.schema.Student;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -76,39 +78,24 @@ public class Tpmms {
     }
 
     public void merge() {
-        BufferReader bufferReader = new BufferReader();
         InputBuffer[] inputBuffers = new InputBuffer[totalBuffers];
         // Fill all input buffers
         for (short i = 0; i < totalBuffers; i++) {
-            try {
-                bufferReader.open(String.format("sublist%05d.out", i));
-                try {
-                    bufferReader.nextInputBuffer(inputBuffers[i]);
-                } catch (IOException e) {
-                    System.out.println("There is a problem with sublist files!");
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("Cannot find sublist files!");
-            }
+            inputBuffers[i].reload(String.format("sublist%05d.out", i));
         }
         // Find the minimum student at each iteration and fill the output buffer
         OutputBuffer outputBuffer = new OutputBuffer();
+        // This iterator cannot be short
         for (int i = 0; i < inputBuffers.length * 2; i++) {
             Student minStudent = getMinimum(inputBuffers);
             outputBuffer.add(minStudent);
             if (outputBuffer.isFull()) {
-                try {
-                    BufferWriter bufferWriter = new BufferWriter("sorted.txt");
-                    bufferWriter.flushOutputBuffer(outputBuffer);
-                    outputBuffer.resetItr();
-                } catch (IOException e) {
-                    System.out.println("Cannot create\\open \"sorted.txt\" file!");
-                }
+                outputBuffer.flush("sorted.txt");
             }
         }
     }
 
-    public Student getMinimum(InputBuffer[] inputBuffers) {
+    private Student getMinimum(InputBuffer[] inputBuffers) {
         short minIndex = 0;
         Student minStudent = inputBuffers[minIndex].getCurrentStudent();
         for (short i = 1; i < inputBuffers.length; i++) {
@@ -119,17 +106,7 @@ public class Tpmms {
         }
         inputBuffers[minIndex].incItr();
         if (inputBuffers[minIndex].isEmpty()) {
-            try {
-                BufferReader bufferReader = new BufferReader(String.format("sublist%05d.out", minIndex));
-                try {
-                    bufferReader.nextInputBuffer(inputBuffers[minIndex]);
-                    inputBuffers[minIndex].resetItr();
-                } catch (IOException e) {
-                    System.out.println("There is a problem with sublist files!");
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("Cannot find sublist files!");
-            }
+            inputBuffers[minIndex].reload(String.format("sublist%05d.out", minIndex));
         }
         return minStudent;
     }
@@ -148,5 +125,4 @@ public class Tpmms {
             // TODO we can find duplicates in more than 2 phases
         }
     }
-
 }
