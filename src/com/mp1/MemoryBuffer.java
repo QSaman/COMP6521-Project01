@@ -4,6 +4,7 @@
 package com.mp1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.naming.SizeLimitExceededException;
 
@@ -35,6 +36,11 @@ public class MemoryBuffer {
 	public boolean isFull()
 	{
 		return students.size() == 40;
+	}
+	
+	public void sort()
+	{
+		Collections.sort(students);
 	}
 	
 	public int size()

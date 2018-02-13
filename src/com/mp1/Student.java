@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
  * @author mirmohammad
  *
  */
-public class Student {
+public class Student implements Comparable<Student> {
 
 	//TODO If we don't use the following static variables, remove them for saving more memory
 	public static final int student_id_len = 8;
@@ -173,5 +173,10 @@ public class Student {
 		if (studentId != other.studentId)
 			return false;
 		return true;
+	}
+
+	@Override
+	public int compareTo(Student o) {
+		return studentId - o.getStudentId();
 	}	
 }
