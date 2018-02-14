@@ -3,7 +3,6 @@ package com.mp1.disk;
 import com.mp1.buffer.MemoryBuffer;
 import com.mp1.schema.Student;
 
-import javax.naming.SizeLimitExceededException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -29,19 +28,10 @@ public class BlockReader {
             br.close();
     }
 
-    public void nextBlock(MemoryBuffer buffer) throws IOException {
+    public void nextBlock(MemoryBuffer memoryBuffer) throws IOException {
         String line;
-        int tuples = 0;
-        while (tuples < 40 && (line = br.readLine()) != null) {
-            ++tuples;
-            Student student = new Student();
-            student.parseLine(line);
-            try {
-                buffer.add(student);
-            } catch (SizeLimitExceededException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        for (short i = 0; i < MemoryBuffer.size && (line = br.readLine()) != null; i++) {
+            memoryBuffer.add(new Student(line), i);
         }
     }
 }

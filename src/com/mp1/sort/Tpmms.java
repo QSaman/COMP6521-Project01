@@ -1,30 +1,28 @@
-package com.mp1;
+package com.mp1.sort;
 
 import com.mp1.buffer.InputBuffer;
 import com.mp1.buffer.MemoryBuffer;
 import com.mp1.buffer.OutputBuffer;
-import com.mp1.disk.BlockReader;
 import com.mp1.disk.BlockWriter;
 import com.mp1.schema.Student;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
 
 /**
  * @author saman
  */
 public class Tpmms {
 
-    private final short numberOfBuffers = 1000;
-    private ArrayList<MemoryBuffer> buffers;
-    private BlockReader inputReader;
-    private short totalBuffers = 0;
+    private short sublistCount = 0;
+    private short buffersCount;
+    private MemoryBuffer[] memoryBuffers;
+    private BufferedReader bufferedReader;
 
-    public Tpmms(String input_file_name) throws FileNotFoundException {
-        buffers = new ArrayList<>();
-        inputReader = new BlockReader();
-        inputReader.open(input_file_name);
+    public Tpmms(String input_file_name, String output_file_name, short buffersCount) throws FileNotFoundException {
+        this.buffersCount = buffersCount;
+        memoryBuffers = new MemoryBuffer[buffersCount];
+        bufferedReader = new BufferedReader(new FileReader(input_file_name));
+
     }
 
     /**
@@ -33,34 +31,31 @@ public class Tpmms {
      * @throws IOException
      */
     public boolean phase1() throws IOException {
-        boolean two_phase = true;
-        boolean done = false;
-        while (!done) {
-            while (buffers.size() <= numberOfBuffers) {
-                if (Runtime.getRuntime().freeMemory() <= 4096) {
-                    two_phase = false;
-                    break;
+        while (true) {
+            for (short i = 0; i < buffersCount; i++) {
+                String line = null;
+                for (short j = 0; j < MemoryBuffer.size && (line = bufferedReader.readLine()) != null; j++) {
+                    memoryBuffers[i].add(new Student(line), j);
                 }
-                MemoryBuffer buffer = new MemoryBuffer();
-                inputReader.nextBlock(buffer);
-                if (buffer.size() == 0) {
-                    done = true;
-                    break;
+                memoryBuffers[i].sort();
+                if (line == null) {
+                    return sublistCount > 0;
                 }
-                buffer.sort();
-                buffers.add(buffer);
-                totalBuffers++;
             }
-            save();
+            sublistCount++;
+            flush();
         }
-        return two_phase;
     }
 
     private boolean mergeRequired() {
         return buffers.size() != 1;
     }
 
-    public void save() {
+    public void flush() throws IOException {
+        for (short i = 0; i < buffersCount; i++) {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(String.format("sublist%05d.out", i++)));
+            bufferedWriter.write(memoryBuffers[i].toString());
+        }
         int i = 1;
         for (MemoryBuffer buffer : buffers)
             if (!buffer.isDone()) {

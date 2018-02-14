@@ -6,7 +6,7 @@ public class Buffer {
 
     public static final short size = 2;
 
-    Student[] buffer = new Student[size];
+    Student[] students = new Student[size];
     short itr = 0;
 
     public void incItr() {

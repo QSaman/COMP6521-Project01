@@ -13,7 +13,7 @@ public class InputBuffer extends Buffer {
     }
 
     public Student getCurrentStudent() {
-        return buffer[itr];
+        return students[itr];
     }
 
     public void reload(String fileName) {
@@ -22,7 +22,7 @@ public class InputBuffer extends Buffer {
         try {
             bufferedReader = new BufferedReader(new FileReader(fileName));
             for (short i = 0; i < Buffer.size && (line = bufferedReader.readLine()) != null; i++) {
-                buffer[i] = new Student(line);
+                students[i] = new Student(line);
             }
         } catch (IOException e) {
             System.out.println("Cannot open \"" + fileName + "\" file!");

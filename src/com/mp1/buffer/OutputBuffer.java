@@ -13,7 +13,7 @@ public class OutputBuffer extends Buffer {
     }
 
     public void add(Student student) {
-        buffer[itr++] = student;
+        students[itr++] = student;
     }
 
     public void flush(String fileName) {
@@ -21,7 +21,7 @@ public class OutputBuffer extends Buffer {
         try {
             bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
             for (int i = 0; i < Buffer.size; i++) {
-                bufferedWriter.write(buffer[i].toString());
+                bufferedWriter.write(students[i].toString());
             }
         } catch (IOException e) {
             System.out.println("Cannot create\\open \"sorted.txt\" file!");
