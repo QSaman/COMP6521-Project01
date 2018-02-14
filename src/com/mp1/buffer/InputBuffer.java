@@ -3,7 +3,6 @@ package com.mp1.buffer;
 import com.mp1.schema.Student;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 public class InputBuffer extends Buffer {
@@ -16,15 +15,19 @@ public class InputBuffer extends Buffer {
         return students[itr];
     }
 
-    public void reload(String fileName) {
+    public void reload(BufferedReader bufferedReader) {
         String line;
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
-            for (short i = 0; i < students.length && (line = bufferedReader.readLine()) != null; i++) {
-                students[i] = new Student(line);
+            for (int i = 0; i < students.length; i++) {
+                if ((line = bufferedReader.readLine()) != null) {
+                    students[i] = new Student(line);
+                    resetItr();
+                } else {
+                    students[i] = new Student();
+                }
             }
         } catch (IOException e) {
-            System.out.println("Cannot open \"" + fileName + "\" file!");
+            System.out.println("Cannot use provided buffered reader!");
         }
     }
 }

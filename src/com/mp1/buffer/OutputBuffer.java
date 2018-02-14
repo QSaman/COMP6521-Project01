@@ -19,9 +19,22 @@ public class OutputBuffer extends Buffer {
     public void flush(String fileName, boolean append) {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, append));
-            for (int i = 0; i < students.length; i++) {
-                bufferedWriter.write(students[i].toString());
+            if (isFull()) {
+                for (Student student : students) {
+                    if (student.getStudentId() != 0) {
+                        bufferedWriter.write(student.toString() + "\r\n");
+                    }
+                }
+            } else {
+                int total = 0;
+                for (int i = 0; total < itr; i++) {
+                    if (students[i].getStudentId() != 0) {
+                        bufferedWriter.write(students[i].toString() + "\r\n");
+                        total++;
+                    }
+                }
             }
+            bufferedWriter.close();
         } catch (IOException e) {
             System.out.println("Cannot create\\open \"" + fileName + "\" file!");
         }

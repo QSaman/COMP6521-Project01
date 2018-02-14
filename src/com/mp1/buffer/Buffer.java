@@ -4,9 +4,9 @@ import com.mp1.schema.Student;
 
 public class Buffer {
 
-    public static short size = 2;
+    public static int size = 2;
 
-    short itr = 0;
+    int itr = 0;
     Student[] students = new Student[size];
 
     public void incItr() {

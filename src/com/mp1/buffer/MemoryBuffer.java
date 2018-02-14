@@ -8,7 +8,7 @@ import com.mp1.schema.Student;
  */
 public class MemoryBuffer extends OutputBuffer {
 
-    public static short size = 40;
+    public static int size = 40;
 
     public MemoryBuffer() {
         students = new Student[size];
@@ -17,13 +17,17 @@ public class MemoryBuffer extends OutputBuffer {
         }
     }
 
+    public Student[] getAllStudents() {
+        return students;
+    }
+
     public void sort() {
-        for (short i = 1; i < students.length; i++) {
+        for (int i = 1; i < students.length; i++) {
             Student key = students[i];
-            short j = (short) (i - 1);
+            int j = i - 1;
             while (j >= 0 && students[j].getStudentId() > key.getStudentId()) {
                 students[j + 1] = students[j];
-                j = (short) (j - 1);
+                j = j - 1;
             }
             students[j + 1] = key;
         }

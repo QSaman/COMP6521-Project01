@@ -15,96 +15,98 @@ import java.io.IOException;
  */
 public class Tpmms {
 
-    private short sublistCount = 0;
-
-    private short buffersCount;
+    private int totalStudents = 0;
+    private int sublistCount = 0;
+    private int bufferCount;
     private MemoryBuffer[] memoryBuffers;
     private BufferedReader bufferedReader;
 
-    public Tpmms(String input_file_name, short buffersCount) throws FileNotFoundException {
-        this.buffersCount = buffersCount;
-        memoryBuffers = new MemoryBuffer[buffersCount];
+    public Tpmms(String input_file_name, int bufferCount) throws FileNotFoundException {
+        this.bufferCount = bufferCount;
+        memoryBuffers = new MemoryBuffer[bufferCount];
         for (int i = 0; i < memoryBuffers.length; i++) {
             memoryBuffers[i] = new MemoryBuffer();
         }
         bufferedReader = new BufferedReader(new FileReader(input_file_name));
     }
 
-    /**
-     * @return true, if we can sort the relation in at most two phases;
-     * otherwise return false
-     * @throws IOException
-     */
     public boolean phase1() throws IOException {
         while (true) {
-            for (short i = 0; i < buffersCount; i++) {
-                String line;
+            for (int i = 0; i < bufferCount; i++) {
+                String line = null;
                 memoryBuffers[i].resetItr();
-                while ((line = bufferedReader.readLine()) != null && !memoryBuffers[i].isFull()) {
+                while (!memoryBuffers[i].isFull() && (line = bufferedReader.readLine()) != null) {
                     memoryBuffers[i].add(new Student(line));
+                    totalStudents++;
                 }
                 memoryBuffers[i].sort();
                 if (line == null) {
-                    flushAllBlocks();
-                    sublistCount++;
-                    return true;
-//                    if (sublistCount > 0) {
-//                        flushAllBlocks();
-//                        sublistCount++;
-//                        return true;
-//                    } else {
-//                        return false;
-//                    }
+                    flushAllBlocks(i + 1);
+                    if (sublistCount > 0) {
+                        sublistCount++;
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             }
+            flushAllBlocks(bufferCount);
             sublistCount++;
-            flushAllBlocks();
         }
     }
 
-    public void phase2() {
-        merge();
+    public void phase2(String fileName) {
+        merge(fileName);
     }
 
-    private void flushAllBlocks() throws IOException {
-        for (short i = 0; i < buffersCount; i++) {
-            memoryBuffers[i].flush(String.format("sublist%05d.out", i++), false);
+    private void flushAllBlocks(int thisPatch) {
+        for (int i = 0; i < thisPatch; i++) {
+            memoryBuffers[i].flush(String.format("tmp/sublist%05d.txt", i), false);
         }
     }
 
-    private void merge() {
-        InputBuffer[] inputBuffers = new InputBuffer[sublistCount * buffersCount];
-        for (short i = 0; i < sublistCount * buffersCount; i++) {
+    private void merge(String fileName) {
+        InputBuffer[] inputBuffers = new InputBuffer[totalStudents / MemoryBuffer.size + 1];
+        BufferedReader[] bufferedReaders = new BufferedReader[totalStudents / MemoryBuffer.size + 1];
+        for (int i = 0; i < totalStudents / MemoryBuffer.size + 1; i++) {
             inputBuffers[i] = new InputBuffer();
-        }
-        // Fill all input buffers
-        for (short i = 0; i < sublistCount * buffersCount; i++) {
-            inputBuffers[i].reload(String.format("sublist%05d.out", i));
-        }
-        // Find the minimum student at each iteration and fill the output buffer
-        OutputBuffer outputBuffer = new OutputBuffer();
-        // This iterator cannot be short
-        for (int i = 0; i < inputBuffers.length * 2; i++) {
-            Student minStudent = getMinimum(inputBuffers);
-            outputBuffer.add(minStudent);
-            if (outputBuffer.isFull()) {
-                outputBuffer.flush("sorted.txt", true);
+            try {
+                bufferedReaders[i] = new BufferedReader(new FileReader(String.format("tmp/sublist%05d.txt", i)));
+                inputBuffers[i].reload(bufferedReaders[i]);
+            } catch (IOException e) {
+                System.out.println("Cannot open \"" + String.format("tmp/sublist%05d.txt", i) + "\" file!");
             }
         }
+        OutputBuffer outputBuffer = new OutputBuffer();
+        for (int i = 0; i < totalStudents; i++) {
+            Student minStudent = getMinimum(inputBuffers, bufferedReaders);
+            outputBuffer.add(minStudent);
+            if (outputBuffer.isFull()) {
+                outputBuffer.flush(fileName, true);
+                outputBuffer.resetItr();
+            }
+        }
+        outputBuffer.flush(fileName, true);
+        outputBuffer.resetItr();
     }
 
-    private Student getMinimum(InputBuffer[] inputBuffers) {
-        short minIndex = 0;
-        Student minStudent = inputBuffers[minIndex].getCurrentStudent();
-        for (short i = 1; i < inputBuffers.length; i++) {
-            if (inputBuffers[i].getCurrentStudent().isLessThan(minStudent)) {
+    private Student getMinimum(InputBuffer[] inputBuffers, BufferedReader[] bufferedReaders) {
+        int minIndex = -1;
+        Student minStudent = new Student();
+        for (int i = 0; i < inputBuffers.length; i++) {
+            if (minIndex < 0 && !inputBuffers[i].isEmpty()) {
+                minIndex = i;
+                minStudent = inputBuffers[minIndex].getCurrentStudent();
+            }
+            if (!inputBuffers[i].isEmpty() && inputBuffers[i].getCurrentStudent().isLessThan(minStudent)
+                    && inputBuffers[i].getCurrentStudent().getStudentId() != 0) {
                 minIndex = i;
                 minStudent = inputBuffers[minIndex].getCurrentStudent();
             }
         }
         inputBuffers[minIndex].incItr();
         if (inputBuffers[minIndex].isEmpty()) {
-            inputBuffers[minIndex].reload(String.format("sublist%05d.out", minIndex));
+            inputBuffers[minIndex].reload(bufferedReaders[minIndex]);
         }
         return minStudent;
     }
