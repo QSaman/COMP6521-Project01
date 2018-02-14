@@ -4,10 +4,10 @@ import com.mp1.schema.Student;
 
 public class Buffer {
 
-    public static final short size = 2;
+    public static short size = 2;
 
-    Student[] students = new Student[size];
     short itr = 0;
+    Student[] students = new Student[size];
 
     public void incItr() {
         itr++;

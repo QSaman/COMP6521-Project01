@@ -3,10 +3,12 @@ package com.mp1.sort;
 import com.mp1.buffer.InputBuffer;
 import com.mp1.buffer.MemoryBuffer;
 import com.mp1.buffer.OutputBuffer;
-import com.mp1.disk.BlockWriter;
 import com.mp1.schema.Student;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * @author saman
@@ -14,15 +16,18 @@ import java.io.*;
 public class Tpmms {
 
     private short sublistCount = 0;
+
     private short buffersCount;
     private MemoryBuffer[] memoryBuffers;
     private BufferedReader bufferedReader;
 
-    public Tpmms(String input_file_name, String output_file_name, short buffersCount) throws FileNotFoundException {
+    public Tpmms(String input_file_name, short buffersCount) throws FileNotFoundException {
         this.buffersCount = buffersCount;
         memoryBuffers = new MemoryBuffer[buffersCount];
+        for (int i = 0; i < memoryBuffers.length; i++) {
+            memoryBuffers[i] = new MemoryBuffer();
+        }
         bufferedReader = new BufferedReader(new FileReader(input_file_name));
-
     }
 
     /**
@@ -34,48 +39,40 @@ public class Tpmms {
         while (true) {
             for (short i = 0; i < buffersCount; i++) {
                 String line = null;
-                for (short j = 0; j < MemoryBuffer.size && (line = bufferedReader.readLine()) != null; j++) {
-                    memoryBuffers[i].add(new Student(line), j);
+                memoryBuffers[i].resetItr();
+                while ((line = bufferedReader.readLine()) != null && !memoryBuffers[i].isFull()) {
+                    memoryBuffers[i].add(new Student(line));
                 }
                 memoryBuffers[i].sort();
                 if (line == null) {
-                    return sublistCount > 0;
+                    if (sublistCount > 0) {
+                        flushAllBlocks();
+                        sublistCount++;
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
             }
             sublistCount++;
-            flush();
+            flushAllBlocks();
         }
     }
 
-    private boolean mergeRequired() {
-        return buffers.size() != 1;
+    public void phase2() {
+        merge();
     }
 
-    public void flush() throws IOException {
+    private void flushAllBlocks() throws IOException {
         for (short i = 0; i < buffersCount; i++) {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(String.format("sublist%05d.out", i++)));
-            bufferedWriter.write(memoryBuffers[i].toString());
+            memoryBuffers[i].flush(String.format("sublist%05d.out", i++), false);
         }
-        int i = 1;
-        for (MemoryBuffer buffer : buffers)
-            if (!buffer.isDone()) {
-                BlockWriter bw = new BlockWriter();
-                try {
-                    bw.open(String.format("sublist%05d.out", i++), true);
-                    bw.write(buffer);
-                    bw.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        buffers.clear();
     }
 
-    public void merge() {
-        InputBuffer[] inputBuffers = new InputBuffer[totalBuffers];
+    private void merge() {
+        InputBuffer[] inputBuffers = new InputBuffer[sublistCount * buffersCount];
         // Fill all input buffers
-        for (short i = 0; i < totalBuffers; i++) {
+        for (short i = 0; i < sublistCount * buffersCount; i++) {
             inputBuffers[i].reload(String.format("sublist%05d.out", i));
         }
         // Find the minimum student at each iteration and fill the output buffer
@@ -85,7 +82,7 @@ public class Tpmms {
             Student minStudent = getMinimum(inputBuffers);
             outputBuffer.add(minStudent);
             if (outputBuffer.isFull()) {
-                outputBuffer.flush("sorted.txt");
+                outputBuffer.flush("sorted.txt", true);
             }
         }
     }
@@ -104,20 +101,5 @@ public class Tpmms {
             inputBuffers[minIndex].reload(String.format("sublist%05d.out", minIndex));
         }
         return minStudent;
-    }
-
-    public void findDuplicates() throws IOException {
-        if (phase1()) {
-            if (mergeRequired()) // We can find duplicates in exactly 2 phases
-            {
-                save();
-                merge();
-            } else // We can find duplicates only in 1 phase
-            {
-                merge();
-            }
-        } else {
-            // TODO we can find duplicates in more than 2 phases
-        }
     }
 }

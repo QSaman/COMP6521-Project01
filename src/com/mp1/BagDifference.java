@@ -15,7 +15,8 @@ public class BagDifference {
 
     private static void bd(String T1, String T2) throws IOException {
         Tpmms tpmms = new Tpmms(T1, (short) ((availableMemory - internalMemoryUsage) / tupleSize));
-        tpmms.setBuffersCount();
+        tpmms.phase1();
+        tpmms.phase2();
     }
 
     public static void main(String[] args) {

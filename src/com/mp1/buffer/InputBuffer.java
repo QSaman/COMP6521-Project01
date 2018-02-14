@@ -9,7 +9,7 @@ import java.io.IOException;
 public class InputBuffer extends Buffer {
 
     public boolean isEmpty() {
-        return itr >= size;
+        return itr >= students.length;
     }
 
     public Student getCurrentStudent() {
@@ -18,10 +18,9 @@ public class InputBuffer extends Buffer {
 
     public void reload(String fileName) {
         String line;
-        BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new FileReader(fileName));
-            for (short i = 0; i < Buffer.size && (line = bufferedReader.readLine()) != null; i++) {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+            for (short i = 0; i < students.length && (line = bufferedReader.readLine()) != null; i++) {
                 students[i] = new Student(line);
             }
         } catch (IOException e) {
