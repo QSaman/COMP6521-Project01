@@ -38,20 +38,23 @@ public class Tpmms {
     public boolean phase1() throws IOException {
         while (true) {
             for (short i = 0; i < buffersCount; i++) {
-                String line = null;
+                String line;
                 memoryBuffers[i].resetItr();
                 while ((line = bufferedReader.readLine()) != null && !memoryBuffers[i].isFull()) {
                     memoryBuffers[i].add(new Student(line));
                 }
                 memoryBuffers[i].sort();
                 if (line == null) {
-                    if (sublistCount > 0) {
-                        flushAllBlocks();
-                        sublistCount++;
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    flushAllBlocks();
+                    sublistCount++;
+                    return true;
+//                    if (sublistCount > 0) {
+//                        flushAllBlocks();
+//                        sublistCount++;
+//                        return true;
+//                    } else {
+//                        return false;
+//                    }
                 }
             }
             sublistCount++;
@@ -71,6 +74,9 @@ public class Tpmms {
 
     private void merge() {
         InputBuffer[] inputBuffers = new InputBuffer[sublistCount * buffersCount];
+        for (short i = 0; i < sublistCount * buffersCount; i++) {
+            inputBuffers[i] = new InputBuffer();
+        }
         // Fill all input buffers
         for (short i = 0; i < sublistCount * buffersCount; i++) {
             inputBuffers[i].reload(String.format("sublist%05d.out", i));

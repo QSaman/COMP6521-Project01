@@ -21,7 +21,7 @@ public class BagDifference {
 
     public static void main(String[] args) {
         try {
-            bd("bag1.txt", "bag2.txt");
+            bd("input.txt", "bag2.txt");
         } catch (IOException e) {
             System.out.println("Cannot open input file!");
         }

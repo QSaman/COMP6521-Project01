@@ -12,6 +12,9 @@ public class MemoryBuffer extends OutputBuffer {
 
     public MemoryBuffer() {
         students = new Student[size];
+        for (int i = 0; i < students.length; i++) {
+            students[i] = new Student();
+        }
     }
 
     public void sort() {
