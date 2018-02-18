@@ -45,7 +45,7 @@ public class Student implements Comparable<Student> {
     }
 
     public boolean isLessThan(Student o) {
-        return studentId - o.getStudentId() < 0;
+    	return compareTo(o) < 0;
     }
 
 	/* (non-Javadoc)
