@@ -1,7 +1,6 @@
 package com.mp1.buffer;
 
 import com.mp1.schema.Student;
-import com.mp1.sort.Tpmms;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -48,7 +47,7 @@ public class InputBuffer {
         studentIterator = students.listIterator();
         System.gc();
         String line;
-        for (int i = 0; i < blocks && Runtime.getRuntime().freeMemory() > Tpmms.misc; i++) {
+        for (int i = 0; i < blocks; i++) {
             try {
                 if ((line = bufferedReader.readLine()) == null) {
                     studentIterator = students.listIterator();

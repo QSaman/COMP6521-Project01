@@ -7,8 +7,8 @@ public class BagDifference {
     private static void bd(String T1, String T2) {
         Tpmms tpmms;
         {
-            tpmms = new Tpmms(T1);
-            tpmms.sort("tpmms1.txt");
+            tpmms = new Tpmms(T2);
+            tpmms.sort("tpmms2.txt");
         }
 //        {
 //            tpmms = new Tpmms(T2);

@@ -14,9 +14,9 @@ import java.util.Optional;
 public class Tpmms {
 
     // Minimum free memory allowed in bytes
-    public static final int misc = 800000;
+    public static final int misc = 1000000;
     // Size of each tuple in bytes
-    public static final int tupleSize = 100;
+    public static final int tupleSize = 89;
     // Number of tuples per block
     public static final int tuples = 40;
 
@@ -53,7 +53,7 @@ public class Tpmms {
 
     private void merge(String outputFileName) {
         ArrayList<InputBuffer> inputBuffers = new ArrayList<>();
-        int blocks = (int) (Runtime.getRuntime().freeMemory() - misc) / ((totalSublists + 1) * tuples * tupleSize);
+        int blocks = (int) (Runtime.getRuntime().freeMemory() - misc) / (totalSublists + 1);
         // Initialize buffers
         for (int i = 0; i < totalSublists; i++) {
             inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks));
@@ -65,7 +65,7 @@ public class Tpmms {
             if (Runtime.getRuntime().freeMemory() < misc) {
                 outputBuffer.flush();
                 /// TEST
-                System.out.println("Output buffer flushed at " + i + " th tuple!");
+                // System.out.println("Output buffer flushed at " + i + " th tuple!");
             }
         }
         outputBuffer.flush();
@@ -85,6 +85,7 @@ public class Tpmms {
             }
             minStudent = inputBuffers.get(minIndex).getNextStudent();
             if (inputBuffers.get(minIndex).isEmpty()) {
+                // System.out.println("Inside is empty " + minIndex);
                 // Reload and check if sublist is done
                 if (!inputBuffers.get(minIndex).isLastBatch()) {
                     inputBuffers.get(minIndex).reload(blocks);
@@ -92,6 +93,7 @@ public class Tpmms {
                     inputBuffers.remove(minIndex);
                     inputBuffers.trimToSize();
                     System.gc();
+                    System.out.println(inputBuffers.size());
                 }
             }
             return Optional.of(minStudent);
