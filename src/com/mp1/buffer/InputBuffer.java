@@ -11,21 +11,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 public class InputBuffer {
 
     private boolean lastBatch = false;
 
-    private ArrayList<Student> students;
+    private List<Student> students;
     private int len, cur;
     private BufferedReader bufferedReader;
     private String line;
     private int blocks;
 
-    public InputBuffer(String sublistFileName, int blocks) {
+    public InputBuffer(String sublistFileName, int blocks, List<Student> st) {
         try {
-        	students = new ArrayList<>();
+        	students = st;
         	bufferedReader = new BufferedReader(new InputStreamReader(
         			new FileInputStream(sublistFileName), StandardCharsets.US_ASCII),
         			Tpmms.tuples * Tpmms.tupleSize);
@@ -52,15 +53,16 @@ public class InputBuffer {
     }
 
     public Student peekNextStudent() {
-        return students.get(cur + 1);
+        return students.get(cur);
     }
 
     public Student getNextStudent() {
-        return students.get(++cur);
+        return students.get(cur++);
     }
 
     public void reload(int blocks) {
     	cur = 0;
+    	len = 0;
         for (int i = 0; i < blocks; i++) {
             try {
                 if ((line = bufferedReader.readLine()) == null) {
@@ -71,7 +73,7 @@ public class InputBuffer {
                 if (len < students.size())
                 	students.get(len++).parseLine(line);
                 else
-                	students.add(new Student(line));
+                	return;
             } catch (IOException e) {
                 System.out.println("Cannot read the input file!");
             }

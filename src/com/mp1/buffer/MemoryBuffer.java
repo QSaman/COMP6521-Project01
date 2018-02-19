@@ -22,7 +22,7 @@ public class MemoryBuffer {
 
     public MemoryBuffer(String inputFileName) {	
         try {
-        	students = new ArrayList<>(Tpmms.student_buf_size);
+        	this.students = new ArrayList<>(Tpmms.student_buf_size);
         	bufferedReader = new BufferedReader(new InputStreamReader(
         			new FileInputStream(inputFileName), StandardCharsets.US_ASCII),
         			Tpmms.tuples * Tpmms.tupleSize);
@@ -32,6 +32,10 @@ public class MemoryBuffer {
         }
     }
     
+    public ArrayList<Student> getBuffer()
+    {
+    	return students;
+    }
     public void clear()
     {
     	students.clear();
@@ -59,7 +63,7 @@ public class MemoryBuffer {
                     }
                     if (len < students.size())
                     	students.get(len++).parseLine(line);
-                    else if (hasEnoughHeap() & len < Tpmms.student_buf_size) 
+                    else if (hasEnoughHeap() & len < Tpmms.student_buf_size)
                     	students.add(new Student(line));
                     else
                     	return true;

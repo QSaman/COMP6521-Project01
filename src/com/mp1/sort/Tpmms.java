@@ -30,9 +30,10 @@ public class Tpmms {
     private int totalSublists = 0;
 
     private MemoryBuffer memoryBuffer;
+    private ArrayList<Student> students;
 
     public Tpmms(String inputFileName) {
-        memoryBuffer = new MemoryBuffer(inputFileName);
+        memoryBuffer = new MemoryBuffer(inputFileName);        
     }
 
     public void sort(String outputFileName) {
@@ -42,6 +43,7 @@ public class Tpmms {
     	System.out.println("");
     	System.out.println("Starting phase 1");    	
         if (phase1()) {
+        	System.out.println("students size: " + students.size());
         	System.out.println("Starting phase 2");
             phase2(outputFileName);
         } else {
@@ -56,8 +58,9 @@ public class Tpmms {
             memoryBuffer.flush(String.format("tmp/sublist%05d.txt", totalSublists++));
             needPhase2 = true;
         }
-        memoryBuffer.clear();
-        System.gc();
+//        memoryBuffer.clear();
+//        System.gc();
+        students = memoryBuffer.getBuffer();
         return needPhase2;
     }
 
@@ -68,9 +71,11 @@ public class Tpmms {
     private void merge(String outputFileName) {
         ArrayList<InputBuffer> inputBuffers = new ArrayList<>();        
         // Initialize buffers
+        int blocks = students.size() / (totalSublists + 1);
+        int index = 0;
         for (int i = 0; i < totalSublists; i++) {
-        	int blocks = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio)) / (totalSublists + 1);
-            inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks));
+        	//int blocks = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio)) / (totalSublists + 1);
+            inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks, students.subList(index, index + blocks)));
         }
         OutputBuffer outputBuffer = new OutputBuffer(outputFileName);
         for (int i = 0; i < memoryBuffer.getTotalStudents(); i++) {
@@ -107,7 +112,6 @@ public class Tpmms {
                     inputBuffers.remove(minIndex);
                     inputBuffers.trimToSize();
                     System.gc();
-                    System.out.println(inputBuffers.size());
                 }
             }
             return Optional.of(minStudent);
