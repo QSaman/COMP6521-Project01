@@ -12,6 +12,8 @@ import java.util.ArrayList;
  */
 public class MemoryBuffer {
 
+    private int totalStudents = 0;
+
     private ArrayList<Student> students = new ArrayList<>();
     private BufferedReader bufferedReader;
 
@@ -21,6 +23,10 @@ public class MemoryBuffer {
         } catch (FileNotFoundException e) {
             System.out.println("Cannot open the \"" + inputFileName + "\" file!");
         }
+    }
+
+    public int getTotalStudents() {
+        return totalStudents;
     }
 
     // Returns true if the input file is not finished
@@ -34,6 +40,7 @@ public class MemoryBuffer {
                         return false;
                     }
                     students.add(new Student(line));
+                    totalStudents++;
                 } catch (IOException e) {
                     System.out.println("Cannot read the input file!");
                     return false;
@@ -53,11 +60,9 @@ public class MemoryBuffer {
             for (Student student : students) {
                 bufferedWriter.write(student.toString() + "\r\n");
             }
+            bufferedWriter.close();
             students = new ArrayList<>();
             System.gc();
-//            students.clear();
-//            students.trimToSize();
-            bufferedWriter.close();
         } catch (IOException e) {
             System.out.println("Cannot write to the \"" + sublistFileName + "\" file!");
         }

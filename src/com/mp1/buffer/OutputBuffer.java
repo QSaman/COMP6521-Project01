@@ -32,7 +32,8 @@ public class OutputBuffer {
                 System.out.println("Cannot write to the output file!");
             }
         });
-        students.clear();
+        students = new ArrayList<>();
+        System.gc();
     }
 
     public void closeOutputFile() {

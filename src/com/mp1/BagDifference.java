@@ -10,10 +10,10 @@ public class BagDifference {
             tpmms = new Tpmms(T1);
             tpmms.sort("tpmms1.txt");
         }
-        {
-            tpmms = new Tpmms(T2);
-            tpmms.sort("tpmms2.txt");
-        }
+//        {
+//            tpmms = new Tpmms(T2);
+//            tpmms.sort("tpmms2.txt");
+//        }
         // TODO: Compare tpmms1.txt and tpmms2.txt and find duplicates I guess!!!
     }
 

@@ -1,6 +1,7 @@
 package com.mp1.buffer;
 
 import com.mp1.schema.Student;
+import com.mp1.sort.Tpmms;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class InputBuffer {
+
+    private boolean lastBatch = false;
 
     private ArrayList<Student> students = new ArrayList<>();
     private ListIterator<Student> studentIterator;
@@ -28,6 +31,10 @@ public class InputBuffer {
         return !studentIterator.hasNext();
     }
 
+    public boolean isLastBatch() {
+        return lastBatch;
+    }
+
     public Student peekNextStudent() {
         return students.get(studentIterator.nextIndex());
     }
@@ -36,21 +43,24 @@ public class InputBuffer {
         return studentIterator.next();
     }
 
-    public boolean reload(int blocks) {
+    public void reload(int blocks) {
+        students = new ArrayList<>();
+        studentIterator = students.listIterator();
+        System.gc();
         String line;
-        for (int i = 0; i < blocks; i++) {
+        for (int i = 0; i < blocks && Runtime.getRuntime().freeMemory() > Tpmms.misc; i++) {
             try {
                 if ((line = bufferedReader.readLine()) == null) {
                     studentIterator = students.listIterator();
-                    return false;
+                    bufferedReader.close();
+                    lastBatch = true;
+                    return;
                 }
                 students.add(new Student(line));
             } catch (IOException e) {
                 System.out.println("Cannot read the input file!");
-                return false;
             }
         }
         studentIterator = students.listIterator();
-        return true;
     }
 }

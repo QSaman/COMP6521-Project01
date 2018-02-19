@@ -14,7 +14,7 @@ import java.util.Optional;
 public class Tpmms {
 
     // Minimum free memory allowed in bytes
-    public static final int misc = 5000;
+    public static final int misc = 800000;
     // Size of each tuple in bytes
     public static final int tupleSize = 100;
     // Number of tuples per block
@@ -53,24 +53,28 @@ public class Tpmms {
 
     private void merge(String outputFileName) {
         ArrayList<InputBuffer> inputBuffers = new ArrayList<>();
-        int blocks = (int) (Runtime.getRuntime().freeMemory() - misc) / ((totalSublists + 1) * tuples * 100);
+        int blocks = (int) (Runtime.getRuntime().freeMemory() - misc) / ((totalSublists + 1) * tuples * tupleSize);
         // Initialize buffers
         for (int i = 0; i < totalSublists; i++) {
             inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks));
         }
         OutputBuffer outputBuffer = new OutputBuffer(outputFileName);
-        for (int i = 0; i < totalStudents; i++) {
+        for (int i = 0; i < memoryBuffer.getTotalStudents(); i++) {
             Student minStudent = getMinimum(inputBuffers, blocks).orElse(new Student());
             outputBuffer.add(minStudent);
             if (Runtime.getRuntime().freeMemory() < misc) {
                 outputBuffer.flush();
+                /// TEST
+                System.out.println("Output buffer flushed at " + i + " th tuple!");
             }
         }
         outputBuffer.flush();
+        outputBuffer.closeOutputFile();
     }
 
     private Optional<Student> getMinimum(ArrayList<InputBuffer> inputBuffers, int blocks) {
         if (!inputBuffers.isEmpty()) {
+            //System.out.println(inputBuffers.size());
             int minIndex = 0;
             Student minStudent = inputBuffers.get(0).peekNextStudent();
             for (int i = 1; i < inputBuffers.size(); i++) {
@@ -81,8 +85,13 @@ public class Tpmms {
             }
             minStudent = inputBuffers.get(minIndex).getNextStudent();
             if (inputBuffers.get(minIndex).isEmpty()) {
-                if (!inputBuffers.get(minIndex).reload(blocks) && inputBuffers.get(minIndex).isEmpty()) {
+                // Reload and check if sublist is done
+                if (!inputBuffers.get(minIndex).isLastBatch()) {
+                    inputBuffers.get(minIndex).reload(blocks);
+                } else {
                     inputBuffers.remove(minIndex);
+                    inputBuffers.trimToSize();
+                    System.gc();
                 }
             }
             return Optional.of(minStudent);
