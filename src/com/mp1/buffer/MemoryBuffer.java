@@ -4,6 +4,7 @@ import com.mp1.schema.Student;
 import com.mp1.sort.Tpmms;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -14,14 +15,18 @@ public class MemoryBuffer {
 
     private int totalStudents = 0;
 
-    private ArrayList<Student> students = new ArrayList<>();
+    private ArrayList<Student> students;
     private int len;
     private BufferedReader bufferedReader;
+    private String line;
 
-    public MemoryBuffer(String inputFileName) {
+    public MemoryBuffer(String inputFileName) {	
         try {
-            bufferedReader = new BufferedReader(new FileReader(inputFileName));
-            clear();
+        	students = new ArrayList<>(Tpmms.student_buf_size);
+        	bufferedReader = new BufferedReader(new InputStreamReader(
+        			new FileInputStream(inputFileName), StandardCharsets.US_ASCII),
+        			Tpmms.tuples * Tpmms.tupleSize);
+            clear();            
         } catch (FileNotFoundException e) {
             System.out.println("Cannot open the \"" + inputFileName + "\" file!");
         }
@@ -40,28 +45,24 @@ public class MemoryBuffer {
     private boolean hasEnoughHeap()
     {
     	boolean ret = Runtime.getRuntime().freeMemory() > (Tpmms.tuples * Tpmms.tupleSize + Tpmms.misc);
-    	if (!ret)
-    	{
-    		System.out.println("Empty memoery: " + Runtime.getRuntime().freeMemory());
-    	}
     	return ret;
     }
 
     // Returns true if the input file is not finished
-    public boolean readBlocksUntilMemory() {
-        String line;
-        while (len < students.size() || hasEnoughHeap()) {
+    public boolean readBlocksUntilMemory() {        
+        while (true) {
             for (int i = 0; i < Tpmms.tuples; i++) {
                 try {
                     if ((line = bufferedReader.readLine()) == null) {
                         bufferedReader.close();
-                        System.out.println("We reached end of file");
                         return false;
                     }
                     if (len < students.size())
                     	students.get(len++).parseLine(line);
-                    else 
+                    else if (hasEnoughHeap() & len < Tpmms.student_buf_size) 
                     	students.add(new Student(line));
+                    else
+                    	return true;
                     totalStudents++;
                 } catch (IOException e) {
                     System.out.println("Cannot read the input file!");
@@ -69,8 +70,6 @@ public class MemoryBuffer {
                 }
             }
         }
-        System.out.println("We utilized memory");
-        return true;
     }
 
     public void sort() {
