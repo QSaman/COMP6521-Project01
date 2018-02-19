@@ -3,7 +3,6 @@ tpmms*.txt
 bag*.txt
 .metadata
 bin/
-tmp/
 *.tmp
 *.bak
 *.swp

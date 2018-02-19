@@ -19,8 +19,8 @@ public class Tpmms {
     public static final int tuples = 40;
     
     // Minimum free memory allowed in bytes
-    public static final double system_ratio = 1.0 / 2.0;
-    public static final double buffer_ratio = 1.0 / 2.0;
+    public static final double system_ratio = 1.0 / 3.0;
+    public static final double buffer_ratio = 2.0 / 3.0;
     
     public static final int misc = (int)((Runtime.getRuntime().freeMemory()) * system_ratio);
     public static final int student_buf = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio));
