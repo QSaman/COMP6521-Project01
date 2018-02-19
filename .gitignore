@@ -1,5 +1,6 @@
 output.txt
 tpmms*.txt
+bag*.txt
 .metadata
 bin/
 tmp/

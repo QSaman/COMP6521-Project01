@@ -36,7 +36,7 @@ public class Student implements Comparable<Student> {
         return left.length - right.length;
     }
 
-    private void parseLine(String line) {
+    public void parseLine(String line) {
         studentId = Integer.parseInt(line.substring(0, 8));
         firstName = line.substring(8, 18).getBytes();
         lastName = line.substring(18, 28).getBytes();

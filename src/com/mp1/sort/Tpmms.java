@@ -30,7 +30,9 @@ public class Tpmms {
     }
 
     public void sort(String outputFileName) {
+    	System.out.println("Starting phase 1");
         if (phase1()) {
+        	System.out.println("Starting phase 2");
             phase2(outputFileName);
         } else {
             memoryBuffer.flush(outputFileName);
@@ -44,6 +46,8 @@ public class Tpmms {
             memoryBuffer.flush(String.format("tmp/sublist%05d.txt", totalSublists++));
             needPhase2 = true;
         }
+        memoryBuffer.clear();
+        System.gc();
         return needPhase2;
     }
 
