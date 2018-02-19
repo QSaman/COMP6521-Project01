@@ -5,38 +5,41 @@ import com.mp1.schema.Student;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class OutputBuffer extends Buffer {
+public class OutputBuffer {
 
-    public boolean isFull() {
-        return itr >= students.length;
+    private ArrayList<Student> students = new ArrayList<>();
+    private BufferedWriter bufferedWriter;
+
+    public OutputBuffer(String outputFileName) {
+        try {
+            bufferedWriter = new BufferedWriter(new FileWriter(outputFileName));
+        } catch (IOException e) {
+            System.out.println("Cannot create the \"" + outputFileName + "\" file!");
+        }
     }
 
     public void add(Student student) {
-        students[itr++] = student;
+        students.add(student);
     }
 
-    public void flush(String fileName, boolean append) {
-        try {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, append));
-            if (isFull()) {
-                for (Student student : students) {
-                    if (student.getStudentId() != 0) {
-                        bufferedWriter.write(student.toString() + "\r\n");
-                    }
-                }
-            } else {
-                int total = 0;
-                for (int i = 0; total < itr; i++) {
-                    if (students[i].getStudentId() != 0) {
-                        bufferedWriter.write(students[i].toString() + "\r\n");
-                        total++;
-                    }
-                }
+    public void flush() {
+        students.forEach(student -> {
+            try {
+                bufferedWriter.write(student.toString() + "\r\n");
+            } catch (IOException e) {
+                System.out.println("Cannot write to the output file!");
             }
+        });
+        students.clear();
+    }
+
+    public void closeOutputFile() {
+        try {
             bufferedWriter.close();
         } catch (IOException e) {
-            System.out.println("Cannot create\\open \"" + fileName + "\" file!");
+            System.out.println("Cannot close the output file!");
         }
     }
 }

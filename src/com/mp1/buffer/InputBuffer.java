@@ -3,31 +3,54 @@ package com.mp1.buffer;
 import com.mp1.schema.Student;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.ListIterator;
 
-public class InputBuffer extends Buffer {
+public class InputBuffer {
+
+    private ArrayList<Student> students = new ArrayList<>();
+    private ListIterator<Student> studentIterator;
+    private BufferedReader bufferedReader;
+
+    public InputBuffer(String sublistFileName, int blocks) {
+        try {
+            bufferedReader = new BufferedReader(new FileReader(sublistFileName));
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot open the \"" + sublistFileName + "\" file!");
+        }
+        reload(blocks);
+    }
 
     public boolean isEmpty() {
-        return itr >= students.length;
+        return !studentIterator.hasNext();
     }
 
-    public Student getCurrentStudent() {
-        return students[itr];
+    public Student peekNextStudent() {
+        return students.get(studentIterator.nextIndex());
     }
 
-    public void reload(BufferedReader bufferedReader) {
+    public Student getNextStudent() {
+        return studentIterator.next();
+    }
+
+    public boolean reload(int blocks) {
         String line;
-        try {
-            for (int i = 0; i < students.length; i++) {
-                if ((line = bufferedReader.readLine()) != null) {
-                    students[i] = new Student(line);
-                    resetItr();
-                } else {
-                    students[i] = new Student();
+        for (int i = 0; i < blocks; i++) {
+            try {
+                if ((line = bufferedReader.readLine()) == null) {
+                    studentIterator = students.listIterator();
+                    return false;
                 }
+                students.add(new Student(line));
+            } catch (IOException e) {
+                System.out.println("Cannot read the input file!");
+                return false;
             }
-        } catch (IOException e) {
-            System.out.println("Cannot use provided buffered reader!");
         }
+        studentIterator = students.listIterator();
+        return true;
     }
 }

@@ -1,35 +1,65 @@
 package com.mp1.buffer;
 
 import com.mp1.schema.Student;
+import com.mp1.sort.Tpmms;
+
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * @author saman
  * This class represent a block in main memory. It can have at most 40 tuples
  */
-public class MemoryBuffer extends OutputBuffer {
+public class MemoryBuffer {
 
-    public static int size = 40;
+    private ArrayList<Student> students = new ArrayList<>();
+    private BufferedReader bufferedReader;
 
-    public MemoryBuffer() {
-        students = new Student[size];
-        for (int i = 0; i < students.length; i++) {
-            students[i] = new Student();
+    public MemoryBuffer(String inputFileName) {
+        try {
+            bufferedReader = new BufferedReader(new FileReader(inputFileName));
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot open the \"" + inputFileName + "\" file!");
         }
     }
 
-    public Student[] getAllStudents() {
-        return students;
+    // Returns true if the input file is not finished
+    public boolean readBlocksUntilMemory() {
+        String line;
+        while (Runtime.getRuntime().freeMemory() > (Tpmms.tuples * Tpmms.tupleSize + Tpmms.misc)) {
+            for (int i = 0; i < Tpmms.tuples; i++) {
+                try {
+                    if ((line = bufferedReader.readLine()) == null) {
+                        bufferedReader.close();
+                        return false;
+                    }
+                    students.add(new Student(line));
+                } catch (IOException e) {
+                    System.out.println("Cannot read the input file!");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void sort() {
-        for (int i = 1; i < students.length; i++) {
-            Student key = students[i];
-            int j = i - 1;
-            while (j >= 0 && students[j].getStudentId() > key.getStudentId()) {
-                students[j + 1] = students[j];
-                j = j - 1;
+        students.sort(Student::compareTo);
+    }
+
+    public void flush(String sublistFileName) {
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(sublistFileName));
+            for (Student student : students) {
+                bufferedWriter.write(student.toString() + "\r\n");
             }
-            students[j + 1] = key;
+            students = new ArrayList<>();
+            System.gc();
+//            students.clear();
+//            students.trimToSize();
+            bufferedWriter.close();
+        } catch (IOException e) {
+            System.out.println("Cannot write to the \"" + sublistFileName + "\" file!");
         }
     }
 }
