@@ -55,7 +55,9 @@ public class Tpmms {
         boolean needPhase2 = false;
         while (memoryBuffer.readBlocksUntilMemory()) {
             memoryBuffer.sort();
-            memoryBuffer.flush(String.format("tmp/sublist%05d.txt", totalSublists++));
+            String name = String.format("tmp/sublist%05d.txt", totalSublists++);
+            System.out.println("Saving memory buffer into " + name);
+            memoryBuffer.flush(name);
             needPhase2 = true;
         }
 //        memoryBuffer.clear();
@@ -78,7 +80,15 @@ public class Tpmms {
             inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks, students.subList(index, index + blocks)));
         }
         OutputBuffer outputBuffer = new OutputBuffer(outputFileName);
+        int progress = -1;
+        int progress_cur;
         for (int i = 0; i < memoryBuffer.getTotalStudents(); i++) {
+        	progress_cur = (int)(i * 100 / memoryBuffer.getTotalStudents());
+        	if (progress_cur > progress)
+        	{
+        		progress = progress_cur;
+        		System.out.println(progress + "%");
+        	}
             Student minStudent = getMinimum(inputBuffers).orElse(new Student());
             outputBuffer.add(minStudent);
             if (Runtime.getRuntime().freeMemory() < misc) {
@@ -87,6 +97,8 @@ public class Tpmms {
                 // System.out.println("Output buffer flushed at " + i + " th tuple!");
             }
         }
+        System.out.println(100 + "%");
+        System.out.println("Saving result into " + outputFileName);
         outputBuffer.flush();
         outputBuffer.closeOutputFile();
     }
