@@ -18,6 +18,11 @@ public class BagDifference {
     }
 
     public static void main(String[] args) {
+    	long startTime = System.nanoTime();
         bd("bag1.txt", "bag2.txt");
+        long endTime = System.nanoTime();
+        long time = endTime - startTime;
+        double seconds = time / 1000000000.0;
+        System.out.println("Execution time: " + seconds + "s");
     }
 }
