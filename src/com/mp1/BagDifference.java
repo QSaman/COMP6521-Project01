@@ -8,6 +8,7 @@ public class BagDifference {
         Tpmms tpmms;
         {
             tpmms = new Tpmms(T2);
+            //tpmms = new Tpmms("bag_test.txt");
             tpmms.sort("tpmms2.txt");
         }
 //        {

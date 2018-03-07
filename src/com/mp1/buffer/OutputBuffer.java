@@ -1,6 +1,7 @@
 package com.mp1.buffer;
 
 import com.mp1.schema.Student;
+import com.mp1.sort.Tpmms;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -10,7 +11,9 @@ import java.util.ArrayList;
 public class OutputBuffer {
 
     private ArrayList<Student> students = new ArrayList<>();
+    private ArrayList<Integer> frequency = new ArrayList<>();
     private BufferedWriter bufferedWriter;
+    private int len = 0;
 
     public OutputBuffer(String outputFileName) {
         try {
@@ -21,19 +24,40 @@ public class OutputBuffer {
     }
 
     public void add(Student student) {
-        students.add(student);
+    	if (len < students.size())
+    	{
+    		students.set(len, student);
+    		frequency.set(len++, 1);
+    	}
+    	else
+    	{
+    		students.add(student);
+    		frequency.add(1);
+    		++len;
+    	}
+    }
+    
+    public void increase()
+    {
+    	int index = frequency.size() - 1;
+    	frequency.set(index, frequency.get(index) + 1);
+    }
+    
+    public boolean shouldFlush()
+    {
+    	return Runtime.getRuntime().freeMemory() <= Tpmms.misc && len >= students.size();
     }
 
     public void flush() {
-        students.forEach(student -> {
+    	for (int i = 0; i < students.size(); ++i)
+    	{
             try {
-                bufferedWriter.write(student.toString() + "\r\n");
+                bufferedWriter.write(students.get(i).toString() + " " + frequency.get(i) + "\r\n");
             } catch (IOException e) {
                 System.out.println("Cannot write to the output file!");
             }
-        });
-        students = new ArrayList<>();
-        System.gc();
+    	}
+    	len = 0;
     }
 
     public void closeOutputFile() {

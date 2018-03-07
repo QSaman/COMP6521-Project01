@@ -34,35 +34,40 @@ public class Tpmms {
 
     public Tpmms(String inputFileName) {
         memoryBuffer = new MemoryBuffer(inputFileName);        
-    }
+    }    
 
     public void sort(String outputFileName) {
     	System.out.println("misc: " + misc);
     	System.out.println("student_buf: " + student_buf);
     	System.out.println("student_buf_size: " + student_buf_size);
     	System.out.println("");
-    	System.out.println("Starting phase 1");    	
-        if (phase1()) {
-        	System.out.println("students size: " + students.size());
-        	System.out.println("Starting phase 2");
-            phase2(outputFileName);
-        } else {
-            memoryBuffer.flush(outputFileName);
-        }
+    	System.out.println("Starting phase 1");
+        phase1();
+    	System.out.println("students size: " + students.size());
+    	System.out.println("Total Students: " + memoryBuffer.getTotalStudents());
+    	System.out.println("Starting phase 2");
+        phase2(outputFileName);
     }
 
     private boolean phase1() {
         boolean needPhase2 = false;
-        while (memoryBuffer.readBlocksUntilMemory()) {
-            memoryBuffer.sort();
-            String name = String.format("tmp/sublist%05d.txt", totalSublists++);
+        while (true) {
+        	int cnt = memoryBuffer.readBlocksUntilMemory();
+        	if (cnt > 0)
+        	{
+        		memoryBuffer.sort();
+            	++totalSublists;
+        	}
+            if (cnt < Tpmms.tuples)
+            	break;
+            String name = String.format("tmp/sublist%05d.txt", totalSublists);
             System.out.println("Saving memory buffer into " + name);
-            memoryBuffer.flush(name);
-            needPhase2 = true;
+            memoryBuffer.flush(name);            
         }
 //        memoryBuffer.clear();
 //        System.gc();
         students = memoryBuffer.getBuffer();
+        needPhase2 = totalSublists > 1;
         return needPhase2;
     }
 
@@ -74,14 +79,25 @@ public class Tpmms {
         ArrayList<InputBuffer> inputBuffers = new ArrayList<>();        
         // Initialize buffers
         int blocks = students.size() / (totalSublists + 1);
+        System.out.println("block: " + blocks);
         int index = 0;
-        for (int i = 0; i < totalSublists; i++) {
-        	//int blocks = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio)) / (totalSublists + 1);
-            inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i), blocks, students.subList(index, index + blocks)));
+        if (totalSublists == 1)
+        {
+        	blocks = memoryBuffer.getBuffer().size();
+        	inputBuffers.add(new InputBuffer(memoryBuffer.getBuffer(), blocks));
         }
+        else
+        {
+	        for (int i = 0; i < totalSublists; i++) {
+	        	//int blocks = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio)) / (totalSublists + 1);
+	            inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i + 1), blocks, students.subList(index, index + blocks)));
+	        }
+        }
+        System.out.println("The number of input buffers: " + inputBuffers.size());
         OutputBuffer outputBuffer = new OutputBuffer(outputFileName);
         int progress = -1;
         int progress_cur;
+        Student cur_student = null;
         for (int i = 0; i < memoryBuffer.getTotalStudents(); i++) {
         	progress_cur = (int)(i * 100 / memoryBuffer.getTotalStudents());
         	if (progress_cur > progress)
@@ -90,11 +106,16 @@ public class Tpmms {
         		System.out.println(progress + "%");
         	}
             Student minStudent = getMinimum(inputBuffers).orElse(new Student());
-            outputBuffer.add(minStudent);
-            if (Runtime.getRuntime().freeMemory() < misc) {
-                outputBuffer.flush();
-                /// TEST
-                // System.out.println("Output buffer flushed at " + i + " th tuple!");
+            if (cur_student == null || !cur_student.equals(minStudent))
+            {            	
+            	outputBuffer.add(minStudent);
+            	cur_student = minStudent;
+            }
+            else
+            	outputBuffer.increase();
+            if (outputBuffer.shouldFlush())
+            {
+            	outputBuffer.flush();
             }
         }
         System.out.println(100 + "%");
@@ -104,12 +125,15 @@ public class Tpmms {
     }
 
     private Optional<Student> getMinimum(ArrayList<InputBuffer> inputBuffers) {
+    	
         if (!inputBuffers.isEmpty()) {
             //System.out.println(inputBuffers.size());
-            int minIndex = 0;
-            Student minStudent = inputBuffers.get(0).peekNextStudent();
-            for (int i = 1; i < inputBuffers.size(); i++) {
-                if (inputBuffers.get(i).peekNextStudent().isLessThan(minStudent)) {
+            int minIndex = -1;
+            Student minStudent = null;//inputBuffers.get(0).peekNextStudent();
+            for (int i = 0; i < inputBuffers.size(); i++) {
+            	if (inputBuffers.get(i).isEmpty())
+            		continue;
+                if (minStudent == null || inputBuffers.get(i).peekNextStudent().isLessThan(minStudent)) {
                     minIndex = i;
                     minStudent = inputBuffers.get(i).peekNextStudent();
                 }
@@ -120,11 +144,11 @@ public class Tpmms {
                 // Reload and check if sublist is done
                 if (!inputBuffers.get(minIndex).isLastBatch()) {
                     inputBuffers.get(minIndex).reload(inputBuffers.get(minIndex).getBlocks());
-                } else {
+                } /*else {
                     inputBuffers.remove(minIndex);
                     inputBuffers.trimToSize();
                     System.gc();
-                }
+                }*/
             }
             return Optional.of(minStudent);
         }

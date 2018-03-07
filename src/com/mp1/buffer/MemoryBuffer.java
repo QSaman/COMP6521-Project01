@@ -53,24 +53,29 @@ public class MemoryBuffer {
     }
 
     // Returns true if the input file is not finished
-    public boolean readBlocksUntilMemory() {        
+    public int readBlocksUntilMemory() {
+    	int ret = 0;
         while (true) {
             for (int i = 0; i < Tpmms.tuples; i++) {
                 try {
+                	if (len >= students.size() && (!hasEnoughHeap() || len >= Tpmms.student_buf_size))
+                		return ret;
                     if ((line = bufferedReader.readLine()) == null) {
                         bufferedReader.close();
-                        return false;
+                        return ret;
                     }
                     if (len < students.size())
                     	students.get(len++).parseLine(line);
-                    else if (hasEnoughHeap() & len < Tpmms.student_buf_size)
-                    	students.add(new Student(line));
                     else
-                    	return true;
+                    {
+                    	students.add(new Student(line));
+                    	++len;
+                    }
                     totalStudents++;
+                    ++ret;
                 } catch (IOException e) {
-                    System.out.println("Cannot read the input file!");
-                    return false;
+                    System.out.println("Memory Buffer: Cannot read the input file!");
+                    return ret;
                 }
             }
         }

@@ -23,10 +23,12 @@ public class InputBuffer {
     private BufferedReader bufferedReader;
     private String line;
     private int blocks;
+    private boolean readFromDisk;
 
     public InputBuffer(String sublistFileName, int blocks, List<Student> st) {
         try {
         	students = st;
+        	readFromDisk = true;
         	bufferedReader = new BufferedReader(new InputStreamReader(
         			new FileInputStream(sublistFileName), StandardCharsets.US_ASCII),
         			Tpmms.tuples * Tpmms.tupleSize);
@@ -35,6 +37,16 @@ public class InputBuffer {
         }
         this.blocks = blocks;
         reload(blocks);
+    }
+        
+    public InputBuffer(List<Student> students, int blocks)
+    {
+    	this.blocks = blocks;
+    	bufferedReader = null;
+    	this.students = students;
+    	cur = 0;
+    	len = students.size();
+    	readFromDisk = false;
     }
     
     public void clear()
@@ -49,7 +61,10 @@ public class InputBuffer {
     }
 
     public boolean isLastBatch() {
-        return lastBatch;
+    	if (readFromDisk)
+    		return lastBatch;
+    	else
+    		return cur >= len;
     }
 
     public Student peekNextStudent() {
@@ -63,6 +78,8 @@ public class InputBuffer {
     public void reload(int blocks) {
     	cur = 0;
     	len = 0;
+    	if (bufferedReader == null)
+    		return;
         for (int i = 0; i < blocks; i++) {
             try {
                 if ((line = bufferedReader.readLine()) == null) {
@@ -75,7 +92,7 @@ public class InputBuffer {
                 else
                 	return;
             } catch (IOException e) {
-                System.out.println("Cannot read the input file!");
+                System.out.println("Input Buffer: Cannot read the input file!");
             }
         }
     }
