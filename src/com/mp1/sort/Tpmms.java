@@ -113,17 +113,15 @@ public class Tpmms {
         		System.out.println(progress + "%");
         	}
             Student minStudent = getMinimum(inputBuffers).orElse(new Student());
-            if (cur_student == null || !cur_student.equals(minStudent))
-            {            	
+            if (cur_student == null || !cur_student.equals(minStudent)) {
+                if (outputBuffer.shouldFlush()) {
+                    outputBuffer.flush();
+                }
             	outputBuffer.add(minStudent);
             	cur_student = minStudent;
             }
             else
             	outputBuffer.increase();
-            if (outputBuffer.shouldFlush())
-            {
-            	outputBuffer.flush();
-            }
         }
         System.out.println(100 + "%");
         System.out.println("Saving result into " + outputFileName);

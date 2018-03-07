@@ -46,6 +46,17 @@ public class Student implements Comparable<Student> {
         address = line.substring(43, 100).getBytes();
     }
 
+    public int parseLineWithFreq(String line) {
+        studentId = Integer.parseInt(line.substring(0, 8));
+        firstName = line.substring(8, 18).getBytes();
+        lastName = line.substring(18, 28).getBytes();
+        department = Short.parseShort(line.substring(28, 31));
+        program = Short.parseShort(line.substring(31, 34));
+        sinNumber = Integer.parseInt(line.substring(34, 43));
+        address = line.substring(43, 100).getBytes();
+        return Integer.parseInt(line.substring(101));
+    }
+
     public int getStudentId() {
         return studentId;
     }
