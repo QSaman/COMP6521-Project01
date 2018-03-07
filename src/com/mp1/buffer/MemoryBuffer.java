@@ -32,6 +32,24 @@ public class MemoryBuffer {
         }
     }
     
+    public void changeInputFile(String inputFileName)
+    {
+    	try {
+    		bufferedReader.close();
+			bufferedReader = new BufferedReader(new InputStreamReader(
+					new FileInputStream(inputFileName), StandardCharsets.US_ASCII),
+					Tpmms.tuples * Tpmms.tupleSize);
+			len = 0;
+			totalStudents = 0;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
     public ArrayList<Student> getBuffer()
     {
     	return students;

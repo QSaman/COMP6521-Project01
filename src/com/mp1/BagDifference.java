@@ -7,8 +7,15 @@ public class BagDifference {
     private static void bd(String T1, String T2) {
         Tpmms tpmms;
         {
-            tpmms = new Tpmms(T2);
+            tpmms = new Tpmms(T1);
             //tpmms = new Tpmms("bag_test.txt");
+            
+            System.out.println("Sorting T1");
+            System.out.println("#################################");
+            tpmms.sort("tpmms1.txt");
+            tpmms.changeInputFile(T2);
+            System.out.println("#################################");
+            System.out.println("Sorting T2");
             tpmms.sort("tpmms2.txt");
         }
 //        {

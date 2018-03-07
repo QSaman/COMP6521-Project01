@@ -33,8 +33,14 @@ public class Tpmms {
     private ArrayList<Student> students;
 
     public Tpmms(String inputFileName) {
-        memoryBuffer = new MemoryBuffer(inputFileName);        
-    }    
+    	memoryBuffer = new MemoryBuffer(inputFileName);
+    }
+    
+    public void changeInputFile(String inputFileName)
+    {
+    	memoryBuffer.changeInputFile(inputFileName);
+    	totalStudents = totalSublists = 0;
+    }
 
     public void sort(String outputFileName) {
     	System.out.println("misc: " + misc);
@@ -79,8 +85,7 @@ public class Tpmms {
         ArrayList<InputBuffer> inputBuffers = new ArrayList<>();        
         // Initialize buffers
         int blocks = students.size() / (totalSublists + 1);
-        System.out.println("block: " + blocks);
-        int index = 0;
+        System.out.println("block: " + blocks);        
         if (totalSublists == 1)
         {
         	blocks = memoryBuffer.getBuffer().size();
@@ -88,9 +93,11 @@ public class Tpmms {
         }
         else
         {
+        	int index = 0;
 	        for (int i = 0; i < totalSublists; i++) {
 	        	//int blocks = (int)((Runtime.getRuntime().freeMemory() * buffer_ratio)) / (totalSublists + 1);
 	            inputBuffers.add(new InputBuffer(String.format("tmp/sublist%05d.txt", i + 1), blocks, students.subList(index, index + blocks)));
+	            index += blocks;
 	        }
         }
         System.out.println("The number of input buffers: " + inputBuffers.size());
