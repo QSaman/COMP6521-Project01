@@ -26,12 +26,18 @@ public class OutputBuffer {
     public void add(Student student) {
     	if (len < students.size())
     	{
-    		students.set(len, student);
+            students.get(len).setStudentId(student.getStudentId());
+            students.get(len).setAddress(student.getAddress());
+            students.get(len).setDepartment(student.getDepartment());
+            students.get(len).setFirstName(student.getFirstName());
+            students.get(len).setLastName(student.getLastName());
+            students.get(len).setProgram(student.getProgram());
+            students.get(len).setSinNumber(student.getSinNumber());
     		frequency.set(len++, 1);
     	}
     	else
     	{
-    		students.add(student);
+            students.add(new Student(student.toString()));
     		frequency.add(1);
     		++len;
     	}
@@ -45,11 +51,11 @@ public class OutputBuffer {
     
     public boolean shouldFlush()
     {
-    	return Runtime.getRuntime().freeMemory() <= Tpmms.misc && len >= students.size();
+        return Runtime.getRuntime().freeMemory() <= Tpmms.misc && len > 0;
     }
 
     public void flush() {
-    	for (int i = 0; i < students.size(); ++i)
+        for (int i = 0; i < len; ++i)
     	{
             try {
                 bufferedWriter.write(students.get(i).toString() + " " + frequency.get(i) + "\r\n");

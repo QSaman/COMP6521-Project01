@@ -92,6 +92,7 @@ public class MemoryBuffer {
                     totalStudents++;
                     ++ret;
                 } catch (IOException e) {
+                    e.printStackTrace();
                     System.out.println("Memory Buffer: Cannot read the input file!");
                     return ret;
                 }

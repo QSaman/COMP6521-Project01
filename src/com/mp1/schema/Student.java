@@ -178,21 +178,21 @@ public class Student implements Comparable<Student> {
      * @param firstName the firstName to set
      */
     public void setFirstName(byte[] firstName) {
-        this.firstName = firstName;
+        System.arraycopy(firstName, 0, this.firstName, 0, this.firstName.length);
     }
 
     /**
      * @return the lastName
      */
     public byte[] getLastName() {
-        return lastName;
+        return this.lastName;
     }
 
     /**
      * @param lastName the lastName to set
      */
     public void setLastName(byte[] lastName) {
-        this.lastName = lastName;
+        System.arraycopy(lastName, 0, this.lastName, 0, this.lastName.length);
     }
 
     /**
@@ -248,7 +248,7 @@ public class Student implements Comparable<Student> {
      * @param address the address to set
      */
     public void setAddress(byte[] address) {
-        this.address = address;
+        System.arraycopy(address, 0, this.address, 0, this.address.length);
     }
 
 }

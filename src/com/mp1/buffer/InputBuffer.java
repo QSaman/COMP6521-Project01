@@ -3,16 +3,9 @@ package com.mp1.buffer;
 import com.mp1.schema.Student;
 import com.mp1.sort.Tpmms;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class InputBuffer {
 
@@ -27,33 +20,31 @@ public class InputBuffer {
 
     public InputBuffer(String sublistFileName, int blocks, List<Student> st) {
         try {
-        	students = st;
-        	readFromDisk = true;
-        	bufferedReader = new BufferedReader(new InputStreamReader(
-        			new FileInputStream(sublistFileName), StandardCharsets.US_ASCII),
-        			Tpmms.tuples * Tpmms.tupleSize);
+            students = st;
+            readFromDisk = true;
+            bufferedReader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(sublistFileName), StandardCharsets.US_ASCII),
+                    Tpmms.tuples * Tpmms.tupleSize);
         } catch (FileNotFoundException e) {
             System.out.println("Cannot open the \"" + sublistFileName + "\" file!");
         }
         this.blocks = blocks;
         reload(blocks);
     }
-        
-    public InputBuffer(List<Student> students, int blocks)
-    {
-    	this.blocks = blocks;
-    	bufferedReader = null;
-    	this.students = students;
-    	cur = 0;
-    	len = students.size();
-    	readFromDisk = false;
+
+    public InputBuffer(List<Student> students, int blocks) {
+        this.blocks = blocks;
+        bufferedReader = null;
+        this.students = students;
+        cur = 0;
+        len = students.size();
+        readFromDisk = false;
     }
-    
-    public void clear()
-    {
-    	students.clear();
-    	len = 0;
-    	cur = 0;
+
+    public void clear() {
+        students.clear();
+        len = 0;
+        cur = 0;
     }
 
     public boolean isEmpty() {
@@ -61,10 +52,10 @@ public class InputBuffer {
     }
 
     public boolean isLastBatch() {
-    	if (readFromDisk)
-    		return lastBatch;
-    	else
-    		return cur >= len;
+        if (readFromDisk)
+            return lastBatch;
+        else
+            return cur >= len;
     }
 
     public Student peekNextStudent() {
@@ -76,10 +67,10 @@ public class InputBuffer {
     }
 
     public void reload(int blocks) {
-    	cur = 0;
-    	len = 0;
-    	if (bufferedReader == null)
-    		return;
+        cur = 0;
+        len = 0;
+        if (bufferedReader == null)
+            return;
         for (int i = 0; i < blocks; i++) {
             try {
                 if ((line = bufferedReader.readLine()) == null) {
@@ -88,27 +79,26 @@ public class InputBuffer {
                     return;
                 }
                 if (len < students.size())
-                	students.get(len++).parseLine(line);
+                    students.get(len++).parseLine(line);
                 else
-                	return;
+                    return;
             } catch (IOException e) {
                 System.out.println("Input Buffer: Cannot read the input file!");
             }
         }
     }
 
-	/**
-	 * @return the blocks
-	 */
-	public int getBlocks() {
-		return blocks;
-	}
+    /**
+     * @return the blocks
+     */
+    public int getBlocks() {
+        return blocks;
+    }
 
-	/**
-	 * @param blocks the blocks to set
-	 */
-	public void setBlocks(int blocks) {
-		this.blocks = blocks;
-	}
-    
+    /**
+     * @param blocks the blocks to set
+     */
+    public void setBlocks(int blocks) {
+        this.blocks = blocks;
+    }
 }
