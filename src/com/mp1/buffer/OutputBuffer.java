@@ -45,7 +45,8 @@ public class OutputBuffer {
     
     public boolean shouldFlush()
     {
-    	return Runtime.getRuntime().freeMemory() <= Tpmms.misc && len >= students.size();
+    	//return Runtime.getRuntime().freeMemory() <= Tpmms.misc && len >= students.size();
+    	return students.size() > 1000;
     }
 
     public void flush() {

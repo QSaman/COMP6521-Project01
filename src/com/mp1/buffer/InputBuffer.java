@@ -82,15 +82,14 @@ public class InputBuffer {
     		return;
         for (int i = 0; i < blocks; i++) {
             try {
+            	if (len >= students.size())
+            		return;
                 if ((line = bufferedReader.readLine()) == null) {
                     bufferedReader.close();
                     lastBatch = true;
                     return;
                 }
-                if (len < students.size())
-                	students.get(len++).parseLine(line);
-                else
-                	return;
+                students.get(len++).parseLine(line);
             } catch (IOException e) {
                 System.out.println("Input Buffer: Cannot read the input file!");
             }

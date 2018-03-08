@@ -10,16 +10,16 @@ public class BagDifference {
     private static void bd(String T1, String T2) {
         Tpmms tpmms;
         {
-//            tpmms = new Tpmms(T1);
-//            //tpmms = new Tpmms("bag_test.txt");
-//
-//            System.out.println("Sorting T1");
-//            System.out.println("#################################");
-//            tpmms.sort("tpmms1.txt");
-//            tpmms.changeInputFile(T2);
-//            System.out.println("#################################");
-//            System.out.println("Sorting T2");
-//            tpmms.sort("tpmms2.txt");
+            tpmms = new Tpmms(T1);
+            //tpmms = new Tpmms("bag_test.txt");
+
+            System.out.println("Sorting T1");
+            System.out.println("#################################");
+            tpmms.sort("tpmms1.txt");
+            tpmms.changeInputFile(T2);
+            System.out.println("#################################");
+            System.out.println("Sorting T2");
+            tpmms.sort("tpmms2.txt");
         }
 
 
@@ -36,7 +36,7 @@ public class BagDifference {
                     Student student2 = new Student();
                     freq2 = student2.parseLineWithFreq(line);
                     diff = student1.compareTo(student2);
-                    System.out.println(diff);
+                    //System.out.println(diff);
                     if (diff >= 0) {
                         if (diff == 0 && freq1 > freq2) {
                             System.out.println(student1.toString() + " " + (freq1 - freq2));
@@ -64,7 +64,9 @@ public class BagDifference {
 
     public static void main(String[] args) {
     	long startTime = System.nanoTime();
-        bd("bag1.txt", "bag2.txt");
+        //bd("bag1.txt", "bag2.txt");
+        bd("demoBag1.txt", "demoBag1.txt");
+        //bd("bag_test.txt", "bag_test.txt");
         long endTime = System.nanoTime();
         long time = endTime - startTime;
         double seconds = time / 1000000000.0;
