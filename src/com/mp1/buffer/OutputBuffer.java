@@ -24,10 +24,13 @@ public class OutputBuffer {
     }
 
     public void add(Student student) {
+    	System.out.println("Adding student " + new String(student.getFirstName()));
     	if (len < students.size())
     	{
     		students.set(len, student);
-    		frequency.set(len++, 1);
+    		frequency.set(len, 1);
+    		++len;
+    		
     	}
     	else
     	{
@@ -35,6 +38,8 @@ public class OutputBuffer {
     		frequency.add(1);
     		++len;
     	}
+    	for (int i = 0; i < len; ++i )
+    		System.out.println("Student name " + i + ": " + new String(students.get(i).getFirstName()));
     }
     
     public void increase()
@@ -50,9 +55,10 @@ public class OutputBuffer {
     }
 
     public void flush() {
-    	for (int i = 0; i < students.size(); ++i)
+    	for (int i = 0; i < len; ++i)
     	{
             try {
+            	System.out.println("writing student " + new String(students.get(i).getFirstName()) + "with freq " + frequency.get(i));
                 bufferedWriter.write(students.get(i).toString() + " " + frequency.get(i) + "\r\n");
             } catch (IOException e) {
                 System.out.println("Cannot write to the output file!");

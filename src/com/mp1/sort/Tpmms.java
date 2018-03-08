@@ -117,6 +117,7 @@ public class Tpmms {
                 if (outputBuffer.shouldFlush()) {
                     outputBuffer.flush();
                 }
+                //System.out.println("min studnet: " + new String(minStudent.getFirstName()));
             	outputBuffer.add(minStudent);
             	cur_student = minStudent;
             }
