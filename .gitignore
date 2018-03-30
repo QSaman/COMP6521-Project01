@@ -1,5 +1,4 @@
 output.txt
-ADBInputFiles
 tpmms*.txt
 bag*.txt
 .metadata
@@ -14,6 +13,13 @@ local.properties
 .loadpath
 .recommenders
 .DS_Store
+
+# Project 2 
+JoinT1.txt
+JoinT2.txt
+JoinT1-out.txt
+JoinT2-out.txt
+JoinFile-in.txt
 
 # External tool builders
 .externalToolBuilders/
