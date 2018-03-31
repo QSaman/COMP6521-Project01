@@ -17,9 +17,9 @@ local.properties
 # Project 2 
 JoinT1.txt
 JoinT2.txt
-JoinT1-out.txt
-JoinT2-out.txt
-JoinFile-in.txt
+ADBOutputFiles
+sublistT1
+sublistT2
 
 # External tool builders
 .externalToolBuilders/
