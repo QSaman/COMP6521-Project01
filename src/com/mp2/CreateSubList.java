@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Scanner;
+
+import com.mp2.JoinFiles.JoinMode;
 
 public class CreateSubList {
 
@@ -89,7 +90,7 @@ public class CreateSubList {
 	}
 	
 	
-	public void readFile(int tupleSize,Comparator<byte[]> cmptr){
+	public void readFile(int tupleSize,Comparator<byte[]> cmptr, JoinMode mode){
 		
 		ArrayList<byte[]> arrLst=new ArrayList<byte[]>();
 		
@@ -111,9 +112,10 @@ public class CreateSubList {
 				
 //				maxFileSize
 				
-				if(fileSize>=maxFileSize || !(fileScanner.hasNextLine())){				
-					Collections.sort(arrLst, cmptr);
-					removeDuplicates(arrLst, cmptr);
+				if(fileSize>=maxFileSize || !(fileScanner.hasNextLine())){
+					if(mode == JoinMode.SORT_BASED) {
+						Collections.sort(arrLst, cmptr);
+					}
 					fileNumber+=1;
 					writeToFile(inpfileName,fileNumber,arrLst);
 					recordNumber=arrLst.size()+recordNumber;
@@ -129,20 +131,7 @@ public class CreateSubList {
 		System.out.println("Number Of I/O to create sublists of " + getInpfileNameWithPath() + ":" + (2* getReadIO()));
 		System.out.println("--------------------------------------------------------");
 	}
-	
-	private void removeDuplicates(List<byte[]> arr, Comparator<byte[]> cmptr) {
-		ListIterator<byte[]> iter = arr.listIterator();
-		while(iter.hasNext()){
-			byte [] element = (byte[])iter.next();
-		    if(cmptr.compare(element, (byte[])iter.next()) == 0){
-		        iter.remove();
-		    }else {
-		    		iter.previous();
-				break;
-			}
-		}
-	}
-	
+
 	private void getBlock(Scanner fileScanner,int maxLineSize, List<byte[]> arr){
 		
 //		int sizeInByte=4000;
@@ -200,7 +189,7 @@ public class CreateSubList {
 		String prjOutFile="JoinT2-out.txt";
 		
 		String joinInFile="JoinFile-in.txt";
-
+		String gpaOutFile = "GPA.txt";
 		
 		String sublistFileDirectoryEmp= currentPath+ "/sublistT1";		
 		String sublistFileDirectoryPrj= currentPath+"/sublistT2";
@@ -226,6 +215,9 @@ public class CreateSubList {
 		
 		long BeginTotalSortJoinTime=0;
 		long EndTotalSortJoinTime=0;
+		
+		// set up mode either nested_join_loop or sort_based algo
+		JoinMode mode = JoinMode.SORT_BASED;
 		JoinFiles jf=null;
 		
 		try {	
@@ -253,7 +245,7 @@ public class CreateSubList {
 		BeginTimeEmp = System.currentTimeMillis();
 		
 		CreateSubList csbEmp=new CreateSubList(inputFileDirectory+empInFile, sublistFileDirectoryEmp);		
-		csbEmp.readFile(100,new PrimaryKeyComparatorEmp());
+		csbEmp.readFile(100,new PrimaryKeyComparatorEmp(),mode);
 		empRecordNumber= csbEmp.getRecordNumber()-1;
 		
 		EndTimeEmp = System.currentTimeMillis();
@@ -262,7 +254,7 @@ public class CreateSubList {
 		BeginTimePrj = System.currentTimeMillis();
 		
 		CreateSubList csbPrj=new CreateSubList(inputFileDirectory+prjInFile, sublistFileDirectoryPrj);
-		csbPrj.readFile(27,new PrimaryKeyComparatorPrj());		
+		csbPrj.readFile(27,new PrimaryKeyComparatorPrj(),mode);		
 		prjRecordNumber= csbPrj.getRecordNumber()-1;
 		
 		EndTimePrj = System.currentTimeMillis();
@@ -282,7 +274,9 @@ public class CreateSubList {
 		BeginTimeJoin = System.currentTimeMillis();
 		jf= new JoinFiles(outputFileDirectory+empOutFile, 
 									outputFileDirectory+prjOutFile, 
-									outputFileDirectory+joinInFile);
+									outputFileDirectory+joinInFile,
+									outputFileDirectory+gpaOutFile,
+									mode);
 		jf.join();
 		EndTimeJoin = System.currentTimeMillis();						
 		
