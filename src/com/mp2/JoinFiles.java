@@ -3,7 +3,10 @@ package com.mp2;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class JoinFiles {
@@ -24,6 +27,9 @@ public class JoinFiles {
 	Scanner empScanner;
 	Scanner prjScanner;
 	PrintWriter joinFilePrntWrtr;
+	
+	// only for nested-loop mode
+	HashMap<Integer, byte[]> hashIndex;
 	
 	long numJoinLine=0;
 	
@@ -61,7 +67,9 @@ public class JoinFiles {
 			e.printStackTrace();
 		}
 		
-		
+		if(mode == JoinMode.NESTED_JOIN_LOOP) {
+			hashIndex = new HashMap<Integer,byte[]>();
+		}
 	}
 	
 	public void initializeGPA() {
@@ -93,39 +101,96 @@ public class JoinFiles {
 		
 		boolean empNextLine=true;
 		boolean prjNextLine=true;
+		boolean isEqual = false;
+		
 		StringBuilder joinTuple=new StringBuilder();
+		
+		int maxFileSize;
+		int fileSize=0;	
+		int blockSize=4000;
+		
+		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+		List<String> jvmArgs =  runtimeMXBean.getInputArguments();
+		if(jvmArgs.contains("-Xmx5m"))
+		{
+			maxFileSize = 1800000;
+		}else {
+			maxFileSize = 2000000;
+		}
+		
 		do {
 			
 			if(empNextLine){
-				crrEmp = empScanner.nextLine();
-				numEmpLine++;
-				crrEmpIDinEmp= Integer.parseInt(crrEmp.substring(0, 8).trim()) ;
 				if(mode == JoinMode.NESTED_JOIN_LOOP) {
+					// 40 Tuples per block - hard coded
+
+					hashIndex.clear();
+					fileSize=0;	
+					while(empScanner.hasNextLine()) {
+						
+						for(int i=1;i<=40 && empScanner.hasNextLine();i++){
+							crrEmp = empScanner.nextLine();
+							numEmpLine++;
+							crrEmpIDinEmp = Integer.parseInt(crrEmp.substring(0, 8).trim()) ;
+							hashIndex.put(crrEmpIDinEmp, crrEmp.getBytes());
+						}
+						fileSize+=blockSize;
+						
+						if(fileSize>=maxFileSize || !(empScanner.hasNextLine())){
+							break;
+						}
+					}
+
 					prjScanner.close();
 					prjScanner = new Scanner(new FileInputStream(prjfileNameWithPath));
+				}else {
+					crrEmp = empScanner.nextLine();
+					numEmpLine++;
+					crrEmpIDinEmp= Integer.parseInt(crrEmp.substring(0, 8).trim()) ;
 				}
-				
 			}
 			while(prjScanner.hasNextLine()){
-				if(crrEmpIDinPrj==crrEmpIDinEmp){
-					if(mode == JoinMode.SORT_BASED) {
+				if(mode == JoinMode.NESTED_JOIN_LOOP) {
+					if(hashIndex.containsKey(crrEmpIDinPrj)) {
+						crrEmpIDinEmp = crrEmpIDinPrj;
+						crrEmp = new String(hashIndex.get(crrEmpIDinPrj));
+						isEqual = true;
 						int creditValue = Integer.parseInt(crrPrj.substring(21,23).trim());
 						currGpa += (float)(Gpa.get(crrPrj.substring(23).trim()) * creditValue);
 						countGpa += creditValue;
+						joinTuple.append(crrPrj).append("******").append(crrEmp);			
+						joinFilePrntWrtr.println(joinTuple);
+						joinTuple.setLength(0);
+						numJoinLine++;	
 					}
-					joinTuple.append(crrPrj).append("******").append(crrEmp);			
-					joinFilePrntWrtr.println(joinTuple);
-					joinTuple.setLength(0);
-					numJoinLine++;	
-				}
-				
-				if(prjNextLine){
-					crrPrj=prjScanner.nextLine();					
-					crrEmpIDinPrj=Integer.parseInt(crrPrj.substring(0, 8).trim());
-					numPrjLine++;
-				}
-				
-				if(mode == JoinMode.SORT_BASED) {
+					
+					if(prjNextLine){
+						crrPrj=prjScanner.nextLine();					
+						crrEmpIDinPrj=Integer.parseInt(crrPrj.substring(0, 8).trim());
+						numPrjLine++;
+					}
+					
+					if(isEqual && crrEmpIDinPrj != crrEmpIDinEmp) {
+						isEqual = false;
+						gpaCalculator(crrEmpIDinEmp);
+					}
+				}else {
+					if(crrEmpIDinPrj==crrEmpIDinEmp){
+						int creditValue = Integer.parseInt(crrPrj.substring(21,23).trim());
+						currGpa += (float)(Gpa.get(crrPrj.substring(23).trim()) * creditValue);
+						countGpa += creditValue;
+						joinTuple.append(crrPrj).append("******").append(crrEmp);			
+						joinFilePrntWrtr.println(joinTuple);
+						joinTuple.setLength(0);
+						numJoinLine++;	
+					}
+					
+					if(prjNextLine){
+						crrPrj=prjScanner.nextLine();					
+						crrEmpIDinPrj=Integer.parseInt(crrPrj.substring(0, 8).trim());
+						numPrjLine++;
+					}
+					
 					if(crrEmpIDinPrj<crrEmpIDinEmp ){					
 						empNextLine=false;
 						prjNextLine=true;
@@ -135,9 +200,7 @@ public class JoinFiles {
 					if(crrEmpIDinPrj>crrEmpIDinEmp ){					
 						empNextLine=true;
 						prjNextLine=true;
-						gpaFileWrtr.println(crrEmpIDinEmp+"    "+(currGpa/(float)countGpa));
-						countGpa = 0;
-						currGpa = 0;
+						gpaCalculator(crrEmpIDinEmp);
 						break;
 					}
 				}
@@ -156,6 +219,10 @@ public class JoinFiles {
 		prjScanner.close();
 	}
 	
-	
+	public void gpaCalculator(int crrEmpIDinEmp) {
+		gpaFileWrtr.println(crrEmpIDinEmp+"    "+(currGpa/(float)countGpa));
+		countGpa = 0;
+		currGpa = 0;
+	}
 	
 }

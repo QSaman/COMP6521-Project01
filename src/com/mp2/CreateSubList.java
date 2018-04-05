@@ -89,8 +89,8 @@ public class CreateSubList {
 		}
 	}
 	
-	
-	public void readFile(int tupleSize,Comparator<byte[]> cmptr, JoinMode mode){
+	// key 1 = t1 , key 2  = t2
+	public void readFile(int tupleSize,Comparator<byte[]> cmptr, JoinMode mode, int key){
 		
 		ArrayList<byte[]> arrLst=new ArrayList<byte[]>();
 		
@@ -113,7 +113,7 @@ public class CreateSubList {
 //				maxFileSize
 				
 				if(fileSize>=maxFileSize || !(fileScanner.hasNextLine())){
-					if(mode == JoinMode.SORT_BASED) {
+					if(mode == JoinMode.SORT_BASED || key == 2) {
 						Collections.sort(arrLst, cmptr);
 					}
 					fileNumber+=1;
@@ -217,7 +217,7 @@ public class CreateSubList {
 		long EndTotalSortJoinTime=0;
 		
 		// set up mode either nested_join_loop or sort_based algo
-		JoinMode mode = JoinMode.SORT_BASED;
+		JoinMode mode = JoinMode.NESTED_JOIN_LOOP;
 		JoinFiles jf=null;
 		
 		try {	
@@ -245,7 +245,7 @@ public class CreateSubList {
 		BeginTimeEmp = System.currentTimeMillis();
 		
 		CreateSubList csbEmp=new CreateSubList(inputFileDirectory+empInFile, sublistFileDirectoryEmp);		
-		csbEmp.readFile(100,new PrimaryKeyComparatorEmp(),mode);
+		csbEmp.readFile(100,new PrimaryKeyComparatorEmp(),mode,1);
 		empRecordNumber= csbEmp.getRecordNumber()-1;
 		
 		EndTimeEmp = System.currentTimeMillis();
@@ -254,7 +254,7 @@ public class CreateSubList {
 		BeginTimePrj = System.currentTimeMillis();
 		
 		CreateSubList csbPrj=new CreateSubList(inputFileDirectory+prjInFile, sublistFileDirectoryPrj);
-		csbPrj.readFile(27,new PrimaryKeyComparatorPrj(),mode);		
+		csbPrj.readFile(27,new PrimaryKeyComparatorPrj(),mode,2);		
 		prjRecordNumber= csbPrj.getRecordNumber()-1;
 		
 		EndTimePrj = System.currentTimeMillis();
@@ -299,19 +299,22 @@ public class CreateSubList {
 		System.out.println("Number Tuples In Join File : " + jf.getNumJoinLine());
 		System.out.println("--------------------------------------------------------");
 		
-		System.out.println("--------------------------------------------------------");
-		System.out.print("Total sort Time(minute):");
-		System.out.printf("%.2f", ((float)(EndTotalSortTime-BeginTotalSortTime)/(float)(1000*60)));
-		System.out.println();
-		System.out.println("--------------------------------------------------------");
-		System.out.print("Total sort Time(ms):");
-		System.out.println((EndTotalSortTime-BeginTotalSortTime));
-		
-		System.out.println("--------------------------------------------------------");
-		System.out.print("Total sort plus join Time(second):");
-		System.out.printf("%.4f" ,((float)(EndTotalSortJoinTime-BeginTotalSortJoinTime)/(float)(1000)));
-		System.out.println();
-		System.out.println("--------------------------------------------------------");
+		if(mode == JoinMode.SORT_BASED) {
+			System.out.println("--------------------------------------------------------");
+			System.out.print("Total sort Time(minute):");
+			System.out.printf("%.2f", ((float)(EndTotalSortTime-BeginTotalSortTime)/(float)(1000*60)));
+			System.out.println();
+			System.out.println("--------------------------------------------------------");
+			System.out.print("Total sort Time(ms):");
+			System.out.println((EndTotalSortTime-BeginTotalSortTime));
+			
+			System.out.println("--------------------------------------------------------");
+			System.out.print("Total sort plus join Time(second):");
+			System.out.printf("%.4f" ,((float)(EndTotalSortJoinTime-BeginTotalSortJoinTime)/(float)(1000)));
+			System.out.println();
+			System.out.println("--------------------------------------------------------");
+		}
+
 		long endTime = System.currentTimeMillis();		
 		System.out.println(("Total Execution Time(ms):" + (endTime-BeginTime)));
 	}
